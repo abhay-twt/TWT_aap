@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/loginTransworldLogo"
+        android:layout_width="319dp"
+        android:layout_height="45dp"
+        app:srcCompat="@drawable/logo" />
+
+    <TextView
+        android:id="@+id/loginAppNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:color="@color/AirForceBlue"
+        android:text="Test_App"
+        android:textAlignment="center"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.458"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.198" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:background="@drawable/custom_edittext"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/liginText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                android:textAlignment="center"
+                android:textColor="@color/AirForceBlue"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/loginUsername"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/custom_edittext"
+                android:drawableStart="@drawable/baseline_person_24"
+                android:drawablePadding="18dp"
+                android:paddingLeft="28dp"
+                android:hint="Username"
+                android:textColor="@color/black"
+                android:textColorHighlight="@color/cardview_dark_background" />
+
+            <EditText
+                android:id="@+id/loginPassword"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/custom_edittext"
+                android:drawableStart="@drawable/baseline_lock_24"
+                android:drawablePadding="18dp"
+                android:paddingLeft="28dp"
+                android:hint="Password"
+                android:textColor="@color/black"
+
+                android:textColorHighlight="@color/cardview_dark_background" />
+
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:background="@color/AirForceBlue"
+                android:text="Login"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:cornerRadius="200dp" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</LinearLayout>
