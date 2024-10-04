@@ -92,7 +92,9 @@
                 android:text="Login"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                app:cornerRadius="200dp" />
+                app:cornerRadius="200dp"
+                android:onClick="goToCamera"
+                />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
