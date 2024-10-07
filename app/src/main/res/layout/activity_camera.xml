@@ -21,45 +21,49 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.074" />
 
+
     <ImageView
         android:id="@+id/cameraImageView"
         android:layout_width="340dp"
         android:layout_height="302dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.154"
+        app:layout_constraintVertical_bias="0.432"
         app:srcCompat="@drawable/camera" />
 
     <ImageView
         android:id="@+id/cameraIconImageView"
-        android:layout_width="148dp"
-        android:layout_height="141dp"
+        android:layout_width="71dp"
+        android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.136"
+        app:layout_constraintHorizontal_bias="0.047"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.623"
-        app:srcCompat="@drawable/cameraicon" />
-
+        app:layout_constraintVertical_bias="0.163"
+        app:srcCompat="@drawable/cameraicon"
+        android:onClick="captureImage"/>
 
     <ImageView
         android:id="@+id/cameraFolderIconImageView"
-        android:layout_width="160dp"
-        android:layout_height="127dp"
+        android:layout_width="74dp"
+        android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.86"
+        app:layout_constraintHorizontal_bias="0.314"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.609"
-        app:srcCompat="@drawable/folder" />
+        app:layout_constraintVertical_bias="0.16"
+        app:srcCompat="@drawable/folder"
+        android:onClick="imageFromGallery"/>
 
     <Button
         android:id="@+id/cameraNextButton"
-        android:layout_width="250dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/AirForceBlue"
         android:text="Next"
@@ -68,10 +72,10 @@
         app:cornerRadius="200dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.932"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.859" />
+        app:layout_constraintVertical_bias="0.154" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
