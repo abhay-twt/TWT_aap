@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PhotoApp</string>
+    <string name="select">Select Items</string>
 </resources>

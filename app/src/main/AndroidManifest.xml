@@ -25,6 +25,8 @@
             android:name=".LoginActivity" />
         <activity
             android:name=".CameraActivity" />
+        <activity
+            android:name=".UserFormActivity" />
     </application>
 
 

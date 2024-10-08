@@ -66,7 +66,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void moveToNext(View view) {
-        Intent intent = new Intent(CameraActivity.this, MainActivity.class);
+        Intent intent = new Intent(CameraActivity.this, UserFormActivity.class);
         startActivity(intent);
     }
 }
