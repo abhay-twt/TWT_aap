@@ -27,6 +27,8 @@
             android:name=".CameraActivity" />
         <activity
             android:name=".UserFormActivity" />
+        <activity
+            android:name=".DamagedContainerActivity" />
     </application>
 
 
