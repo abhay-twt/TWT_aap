@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class UserFormActivity  extends AppCompatActivity {
@@ -23,6 +25,11 @@ public class UserFormActivity  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_form);
+        //Container Number
+        EditText con_No_EditText = findViewById(R.id.containerNumber);
+        Intent intent = getIntent();
+        con_No_EditText.setText(intent.getStringExtra("cno"));
+
 
         //Activity
         AutoCompleteTextView activityView = findViewById(R.id.autoCompleteTextViewActivity);
