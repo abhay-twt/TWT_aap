@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 public class CameraActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> resultLauncher;
     static String ContainerNumber ="";
+    boolean flag = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +51,8 @@ public class CameraActivity extends AppCompatActivity {
             Bitmap photo = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
             ImageView capturedImageView = findViewById(R.id.cameraImageView);
             capturedImageView.setImageBitmap(photo);
-            ContainerNumber = getValidContainerNumbersFromImage(photo).get(0);
+            flag = true;
+            //ContainerNumber = getValidContainerNumbersFromImage(photo).get(0);
         }
     }
 
@@ -141,7 +143,8 @@ public class CameraActivity extends AppCompatActivity {
                             assert imageUri != null;
                             Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver , imageUri);
                             capturedImageView.setImageURI(imageUri);
-                            ContainerNumber = getValidContainerNumbersFromImage(photo).get(0);
+                            flag = true;
+                            ContainerNumber = getValidContainerNumbersFromImage(photo).isEmpty()?"":getValidContainerNumbersFromImage(photo).get(0);
                         }
                         catch (Exception e)
                         {
@@ -160,7 +163,7 @@ public class CameraActivity extends AppCompatActivity {
     {
         ImageView capturedImageView = findViewById(R.id.cameraImageView);
 
-        if(capturedImageView.getDrawable()!=null)
+        if(flag == true)
         {
             Intent intent = new Intent(CameraActivity.this, UserFormActivity.class);
             intent.putExtra("cno",ContainerNumber);

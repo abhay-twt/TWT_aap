@@ -58,7 +58,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="350dp"
         android:layout_height="60dp"
-        android:hint="Gate In/Gate Out"
+        android:hint="Activity"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp">
 

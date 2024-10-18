@@ -4,8 +4,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/corner_radius"
-    android:backgroundTint="@color/Red"
-    android:orientation="horizontal">
+    android:backgroundTint="@color/black"
+    android:orientation="horizontal"
+    android:alpha="0.6">
 
 
     <TextView

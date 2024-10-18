@@ -53,17 +53,10 @@ public class LoginActivity extends AppCompatActivity {
     private boolean CheckAllFields() {
 
         boolean retValue = true;
-        LayoutInflater inflater = getLayoutInflater();
-        View customToastLayout = inflater.inflate(R.layout.activity_custom_toast,(ViewGroup) findViewById(R.id.custom_toast_container));
-        Toast mToast = new Toast(getApplicationContext());
-        mToast.setDuration(Toast.LENGTH_LONG);
-        mToast.setView(customToastLayout);
-
         if (userName.length() == 0) {
 
             return false;
         }
-
         if (passWord.length() == 0) {
 
             return false;

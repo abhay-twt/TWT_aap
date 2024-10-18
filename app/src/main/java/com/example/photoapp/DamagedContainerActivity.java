@@ -6,8 +6,13 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +22,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class DamagedContainerActivity extends AppCompatActivity {
 
@@ -25,6 +31,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
     ImageView icon;
     ArrayList<Uri> uri = new ArrayList<Uri>();
     private static  final int Read_Permission = 101;
+    EditText remark;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +40,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
 
         icon = findViewById(R.id.FolderIconImageView);
         recyclerView = findViewById(R.id.recyclerView_Gallery_Images);
+        remark = findViewById(R.id.editTextMultiLine);
 
         adapter = new RecycleAdapter(uri);
         recyclerView.setLayoutManager(new GridLayoutManager(DamagedContainerActivity.this,3));
@@ -81,9 +89,42 @@ public class DamagedContainerActivity extends AppCompatActivity {
     }
 
     public void moveToNext(View view) {
-        Intent intent = new Intent(DamagedContainerActivity.this, MainActivity.class);
-        startActivity(intent);
+
+        LayoutInflater inflater = getLayoutInflater();
+        View customToastLayout = inflater.inflate(R.layout.activity_custom_toast,(ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView txtMessage = customToastLayout.findViewById(R.id.text);
+        Toast mToast = new Toast(getApplicationContext());
+        mToast.setDuration(Toast.LENGTH_LONG);
+        mToast.setView(customToastLayout);
+
+        if(CheckAllFields())
+        {
+            if(Objects.requireNonNull(recyclerView.getAdapter()).getItemCount()>0)
+            {
+                Intent intent = new Intent(DamagedContainerActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+            else
+            {
+                txtMessage.setText("Please upload atleast 1 image to continue");
+                mToast.show();
+            }
+        }
+        else
+        {
+            txtMessage.setText("Enter the Damaged container details");
+            mToast.show();
+        }
+
     }
 
+    private boolean CheckAllFields() {
 
+        boolean retValue = true;
+        if (remark.length() == 0) {
+
+            return false;
+        }
+        return retValue;
+    }
 }

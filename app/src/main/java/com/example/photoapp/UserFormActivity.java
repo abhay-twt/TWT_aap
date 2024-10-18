@@ -5,12 +5,16 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class UserFormActivity  extends AppCompatActivity {
 
@@ -40,10 +45,25 @@ public class UserFormActivity  extends AppCompatActivity {
     ArrayList<Uri> uri = new ArrayList<Uri>();
     private static  final int Read_Permission = 101;
 
+    EditText con_No_EditText,DateTime;
+    AutoCompleteTextView activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_form);
+
+        con_No_EditText = findViewById(R.id.containerNumber);
+        DateTime = findViewById(R.id.dateTime);
+        activityView  = findViewById(R.id.autoCompleteTextViewActivity);
+        conTypeView= findViewById(R.id.autoComTVContTypeList);
+        conSizeView= findViewById(R.id.autoComTVContSizeList);
+        locView= findViewById(R.id.autoComTVLocationList);
+        surveyorView= findViewById(R.id.autoComTVSurveyorNameList);
+        conStatusView= findViewById(R.id.autoComTVConStatusList);
+
 
         icon = findViewById(R.id.FolderIconImageView);
         recyclerView = findViewById(R.id.recyclerView_Gallery_Images);
@@ -75,39 +95,30 @@ public class UserFormActivity  extends AppCompatActivity {
         });
 
         //Container Number
-        EditText con_No_EditText = findViewById(R.id.containerNumber);
         Intent intent = getIntent();
         con_No_EditText.setText(intent.getStringExtra("cno"));
 
         //Time
-        EditText DateTime = findViewById(R.id.dateTime);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
         DateTime.setText(dtf.format(now));
         DateTime.setEnabled(false);
 
         //Activity
-        AutoCompleteTextView activityView = findViewById(R.id.autoCompleteTextViewActivity);
         setDropdowns(activityView,activity);
 
         //Container Type
-        AutoCompleteTextView conTypeView = findViewById(R.id.autoComTVContTypeList);
         setDropdowns(conTypeView,containerType);
 
         //Container Size
-        AutoCompleteTextView conSizeView = findViewById(R.id.autoComTVContSizeList);
         setDropdowns(conSizeView,containerSize);
 
         //Locations
-        AutoCompleteTextView locView= findViewById(R.id.autoComTVLocationList);
         setDropdowns(locView,locations);
         //Surveyors
-
-        AutoCompleteTextView surveyorView = findViewById(R.id.autoComTVSurveyorNameList);
         setDropdowns(surveyorView,surveyors);
 
         //Container Status
-        AutoCompleteTextView conStatusView= findViewById(R.id.autoComTVConStatusList);
         setDropdowns(conStatusView,containerStatus);
 
         activityView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -190,7 +201,48 @@ public class UserFormActivity  extends AppCompatActivity {
     }
 
     public void moveToNext(View view) {
-        Intent intent = new Intent(UserFormActivity.this, DamagedContainerActivity.class);
-        startActivity(intent);
+
+        LayoutInflater inflater = getLayoutInflater();
+        View customToastLayout = inflater.inflate(R.layout.activity_custom_toast,(ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView txtMessage = customToastLayout.findViewById(R.id.text);
+        Toast mToast = new Toast(getApplicationContext());
+        mToast.setDuration(Toast.LENGTH_LONG);
+        mToast.setView(customToastLayout);
+
+        if(CheckAllFields())
+        {
+            if(recyclerView.getAdapter().getItemCount()>0)
+            {
+                Intent intent = new Intent(UserFormActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+            else
+            {
+                txtMessage.setText("Please upload atleast 1 image to continue");
+                mToast.show();
+            }
+        }
+        else {
+            txtMessage.setText("All Fields are required");
+            mToast.show();
+        }
+
+    }
+
+    private boolean CheckAllFields() {
+        boolean retValue = true;
+        if(con_No_EditText.length() == 0) {
+            return false;
+        }
+
+        if(DateTime.length() == 0) {
+            return false;
+        }
+
+        if(activityView.getText().toString().isEmpty() || locView.getText().toString().isEmpty()  || surveyorView.getText().toString().isEmpty()  || conTypeView.getText().toString().isEmpty()  || conSizeView.getText() .toString().isEmpty() || conStatusView.getText().toString().isEmpty())
+        {
+            return false;
+        }
+        return retValue;
     }
 }
