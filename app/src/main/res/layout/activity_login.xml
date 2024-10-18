@@ -50,38 +50,51 @@
                 android:textColor="@color/AirForceBlue"
                 android:textSize="36sp"
                 android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/loginUsername"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="40dp"
-                android:background="@drawable/custom_edittext"
-                android:drawableStart="@drawable/baseline_person_24"
-                android:drawablePadding="18dp"
-                android:paddingLeft="28dp"
-                android:hint="Username"
-                android:textColor="@color/black"
-                android:textColorHighlight="@color/cardview_dark_background" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/loginUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:drawableStart="@drawable/baseline_person_24"
+                    android:drawablePadding="18dp"
+                    android:hint="Username"
+                    android:inputType="text"
+                    android:paddingLeft="28dp"
+                    android:textColor="@color/black"
+                    android:textColorHighlight="@color/cardview_dark_background" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/loginPassword"
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="40dp"
-                android:background="@drawable/custom_edittext"
-                android:drawableStart="@drawable/baseline_lock_24"
-                android:drawablePadding="18dp"
-                android:paddingLeft="28dp"
-                android:hint="Password"
-                android:textColor="@color/black"
-                android:textColorHighlight="@color/cardview_dark_background" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                app:passwordToggleEnabled="true">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/loginPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:drawableStart="@drawable/baseline_lock_24"
+                    android:drawablePadding="18dp"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:paddingLeft="28dp"
+                    android:textColor="@color/black"
+                    android:textColorHighlight="@color/cardview_dark_background" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+
+
 
             <Button
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="40dp"
                 android:background="@color/AirForceBlue"
                 android:text="Login"
                 android:textColor="@color/white"

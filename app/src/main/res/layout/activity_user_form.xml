@@ -182,13 +182,28 @@
             android:layout_marginTop="25dp"
             android:layout_marginStart="20dp" />
         <ImageView
+            android:id="@+id/FolderIconImageView"
+            android:layout_width="71dp"
+            android:layout_height="48dp"
+           android:layout_marginLeft="50dp"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/folder" />
+        <ImageView
             android:id="@+id/cameraIconImageView"
             android:layout_width="71dp"
             android:layout_height="48dp"
             app:srcCompat="@drawable/cameraicon"
             android:layout_marginTop="20dp"
-            android:layout_marginStart="150dp"/>
+           />
     </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_Gallery_Images"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarStyle="outsideInset"
+        android:scrollbars="vertical"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"/>
     <Button
     android:id="@+id/NextButton"
     android:layout_width="wrap_content"
