@@ -1,9 +1,9 @@
 package com.example.photoapp;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,7 +38,9 @@ public class UserFormActivity  extends AppCompatActivity {
     String[]  locations = {"Dadri","Mundra 1","Mundra 2"};
     String[]  surveyors = {"Durga","Varsha","Ganesh"};
     String[]  containerStatus = {"Damaged","Gate Out"};
+    ArrayList<String>  containerNos = new ArrayList<String>();
 
+    private Dialog dialog;
     ArrayAdapter<String> adapterItems;
     RecyclerView recyclerView;
     RecycleAdapter adapter;
@@ -45,8 +48,8 @@ public class UserFormActivity  extends AppCompatActivity {
     ArrayList<Uri> uri = new ArrayList<Uri>();
     private static  final int Read_Permission = 101;
 
-    EditText con_No_EditText,DateTime;
-    AutoCompleteTextView activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
+    EditText DateTime;
+    AutoCompleteTextView containerNumberView,activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
 
 
 
@@ -55,7 +58,7 @@ public class UserFormActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_form);
 
-        con_No_EditText = findViewById(R.id.containerNumber);
+        containerNumberView = findViewById(R.id.autoCompleteTextContainerNo);
         DateTime = findViewById(R.id.dateTime);
         activityView  = findViewById(R.id.autoCompleteTextViewActivity);
         conTypeView= findViewById(R.id.autoComTVContTypeList);
@@ -64,6 +67,31 @@ public class UserFormActivity  extends AppCompatActivity {
         surveyorView= findViewById(R.id.autoComTVSurveyorNameList);
         conStatusView= findViewById(R.id.autoComTVConStatusList);
 
+        //Dialog to confirm the Container No
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_dialog_layout);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(getDrawable(R.drawable.custom_dialog_background));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(false); //Optional
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //Setting the animations to dialog
+
+        Button Okay = dialog.findViewById(R.id.btn_okay);
+        Button Cancel = dialog.findViewById(R.id.btn_cancel);
+
+        Okay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserFormActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
 
         icon = findViewById(R.id.FolderIconImageView);
         recyclerView = findViewById(R.id.recyclerView_Gallery_Images);
@@ -85,10 +113,7 @@ public class UserFormActivity  extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setType("image/*");
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                {
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
-                }
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent,"Select Picture"),1);
             }
@@ -96,13 +121,25 @@ public class UserFormActivity  extends AppCompatActivity {
 
         //Container Number
         Intent intent = getIntent();
-        con_No_EditText.setText(intent.getStringExtra("cno"));
+        containerNos = intent.getStringArrayListExtra("cno");
+        assert containerNos != null;
+        if(!containerNos.isEmpty())
+        {
+            containerNumberView.setText(containerNos.get(0));
+            TextView t = dialog.findViewById(R.id.conMsg);
+            t.setText(containerNumberView.getText().toString());
+        }
 
         //Time
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
         DateTime.setText(dtf.format(now));
         DateTime.setEnabled(false);
+
+        //Container Number
+        String[] cnos = new String[containerNos.size()];
+        cnos = containerNos.toArray(cnos);
+        setDropdowns(containerNumberView, cnos);
 
         //Activity
         setDropdowns(activityView,activity);
@@ -120,6 +157,14 @@ public class UserFormActivity  extends AppCompatActivity {
 
         //Container Status
         setDropdowns(conStatusView,containerStatus);
+
+        containerNumberView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String item = adapterView.getItemAtPosition(position).toString();
+                containerNumberView.setText(item, false);
+            }
+        });
 
         activityView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -213,8 +258,7 @@ public class UserFormActivity  extends AppCompatActivity {
         {
             if(recyclerView.getAdapter().getItemCount()>0)
             {
-                Intent intent = new Intent(UserFormActivity.this, MainActivity.class);
-                startActivity(intent);
+                dialog.show();
             }
             else
             {

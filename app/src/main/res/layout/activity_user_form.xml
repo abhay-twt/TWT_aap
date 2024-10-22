@@ -26,19 +26,22 @@
         android:layout_marginTop="15dp"
         android:layout_marginStart="10dp"/>
 
-    <EditText
-        android:id="@+id/containerNumber"
-        android:layout_width="330dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/custom_edittext"
-        android:drawableStart="@drawable/baseline_local_shipping_24"
-        android:drawablePadding="18dp"
-        android:hint="Container Number"
-        android:paddingLeft="28dp"
-        android:textColor="@color/black"
-        android:textColorHighlight="@color/cardview_dark_background" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="330dp"
+            android:layout_height="60dp"
+            android:hint="Container Number"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextContainerNo"
+                android:layout_width="330dp"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:inputType="text"
+                android:textAlignment="textStart" />
+        </com.google.android.material.textfield.TextInputLayout>
 
     <EditText
         android:id="@+id/dateTime"
@@ -56,7 +59,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="350dp"
+        android:layout_width="330dp"
         android:layout_height="60dp"
         android:hint="Activity"
         android:layout_gravity="center_horizontal"
@@ -64,82 +67,82 @@
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextViewActivity"
-            android:layout_width="350dp"
+            android:layout_width="330dp"
             android:layout_height="50dp"
             android:layout_gravity="start"
-            android:inputType="none"
+            android:inputType="text"
             android:textAlignment="textStart" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="350dp"
+        android:layout_width="330dp"
         android:layout_height="60dp"
         android:hint="Container Type"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal">
         <AutoCompleteTextView
             android:id="@+id/autoComTVContTypeList"
-            android:layout_width="350dp"
+            android:layout_width="330dp"
             android:layout_height="50dp"
-            android:inputType="none" />
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="350dp"
+        android:layout_width="330dp"
         android:layout_height="60dp"
         android:hint="Container Size"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal">
         <AutoCompleteTextView
             android:id="@+id/autoComTVContSizeList"
-            android:layout_width="350dp"
+            android:layout_width="330dp"
             android:layout_height="50dp"
-            android:inputType="none" />
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="350dp"
+        android:layout_width="330dp"
         android:layout_height="60dp"
         android:hint="Location"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal">
         <AutoCompleteTextView
             android:id="@+id/autoComTVLocationList"
-            android:layout_width="350dp"
+            android:layout_width="330dp"
             android:layout_height="50dp"
-            android:inputType="none" />
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="350dp"
+        android:layout_width="330dp"
         android:layout_height="60dp"
         android:hint="Surveyor Name"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal">
         <AutoCompleteTextView
             android:id="@+id/autoComTVSurveyorNameList"
-            android:layout_width="350dp"
+            android:layout_width="330dp"
             android:layout_height="50dp"
-            android:inputType="none" />
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="350dp"
+        android:layout_width="330dp"
         android:layout_height="60dp"
         android:hint="Container Status"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal">
         <AutoCompleteTextView
             android:id="@+id/autoComTVConStatusList"
-            android:layout_width="350dp"
+            android:layout_width="330dp"
             android:layout_height="50dp"
-            android:inputType="none" />
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -153,11 +156,11 @@
         android:textAlignment="center"
         android:textSize="15sp"
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp" />
+        android:layout_marginLeft="35dp" />
 
     <EditText
         android:id="@+id/editTextTextMultiLine"
-        android:layout_width="350dp"
+        android:layout_width="330dp"
         android:layout_height="100dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/custom_edittext"
@@ -168,7 +171,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
         <TextView
             android:id="@+id/addContainersTextView"
             android:layout_width="wrap_content"
@@ -203,6 +207,7 @@
         android:scrollbarStyle="outsideInset"
         android:scrollbars="vertical"
         android:layout_marginTop="5dp"
+        android:layout_gravity="center_horizontal"
         android:padding="5dp"/>
     <Button
     android:id="@+id/NextButton"
