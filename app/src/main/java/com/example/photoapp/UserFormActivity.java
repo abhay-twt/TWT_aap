@@ -275,15 +275,11 @@ public class UserFormActivity  extends AppCompatActivity {
 
     private boolean CheckAllFields() {
         boolean retValue = true;
-        if(con_No_EditText.length() == 0) {
-            return false;
-        }
-
         if(DateTime.length() == 0) {
             return false;
         }
 
-        if(activityView.getText().toString().isEmpty() || locView.getText().toString().isEmpty()  || surveyorView.getText().toString().isEmpty()  || conTypeView.getText().toString().isEmpty()  || conSizeView.getText() .toString().isEmpty() || conStatusView.getText().toString().isEmpty())
+        if(containerNumberView.getText().toString().isEmpty() || activityView.getText().toString().isEmpty() || locView.getText().toString().isEmpty()  || surveyorView.getText().toString().isEmpty()  || conTypeView.getText().toString().isEmpty()  || conSizeView.getText() .toString().isEmpty() || conStatusView.getText().toString().isEmpty())
         {
             return false;
         }
