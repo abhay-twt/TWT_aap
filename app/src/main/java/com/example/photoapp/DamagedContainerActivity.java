@@ -1,11 +1,12 @@
 package com.example.photoapp;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,22 +29,24 @@ public class DamagedContainerActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     RecycleAdapter adapter;
-    ImageView icon;
+    ImageView galleryIcon,cameraIcon;
     ArrayList<Uri> uri = new ArrayList<Uri>();
     private static  final int Read_Permission = 101;
     EditText remark;
+    Uri cam_uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_damaged_container);
 
-        icon = findViewById(R.id.FolderIconImageView);
+        galleryIcon = findViewById(R.id.FolderIconImageView);
+        cameraIcon = findViewById(R.id.cameraIconImageView);
         recyclerView = findViewById(R.id.recyclerView_Gallery_Images);
         remark = findViewById(R.id.editTextMultiLine);
 
         adapter = new RecycleAdapter(uri);
-        recyclerView.setLayoutManager(new GridLayoutManager(DamagedContainerActivity.this,3));
+        recyclerView.setLayoutManager(new GridLayoutManager(DamagedContainerActivity.this,2));
         recyclerView.setAdapter(adapter);
 
         if(ContextCompat.checkSelfPermission(DamagedContainerActivity.this,android.Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -54,39 +57,60 @@ public class DamagedContainerActivity extends AppCompatActivity {
                     Read_Permission);
         }
 
-        icon.setOnClickListener(new View.OnClickListener() {
+        galleryIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setType("image/*");
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                {
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
-                }
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent,"Select Picture"),1);
             }
         });
+
+        cameraIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera");
+                cam_uri = getApplicationContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cam_uri);
+                startActivityForResult(cameraIntent,123);
+            }
+        });
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1 & resultCode == Activity.RESULT_OK){
-            if(data.getClipData()!=null)
+        if((requestCode==1 || requestCode == 123) & resultCode == Activity.RESULT_OK){
+            if(data!=null)
             {
-                int x= data.getClipData().getItemCount();
-                for(int i=0;i<x;i++){
-                    uri.add(data.getClipData().getItemAt(i).getUri());
+                if(data.getClipData()!=null)
+                {
+                    int x= data.getClipData().getItemCount();
+                    for(int i=0;i<x;i++){
+                        uri.add(data.getClipData().getItemAt(i).getUri());
+                        adapter.notifyDataSetChanged();
+                    }
                 }
-                adapter.notifyDataSetChanged();
+                else if(data.getData()!=null){
+                    String imageURL = data.getData().getPath();
+                    uri.add(Uri.parse(imageURL));
+                }
+
             }
-            if(data.getData()!=null){
-                String imageURL = data.getData().getPath();
-                uri.add(Uri.parse(imageURL));
+            else
+            {
+                uri.add(cam_uri);
+                adapter.notifyDataSetChanged();
             }
         }
     }
+
 
     public void moveToNext(View view) {
 

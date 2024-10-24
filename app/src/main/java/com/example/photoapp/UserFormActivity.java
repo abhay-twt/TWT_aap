@@ -1,10 +1,12 @@
 package com.example.photoapp;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,23 +34,24 @@ import java.util.Objects;
 
 public class UserFormActivity  extends AppCompatActivity {
 
-    String[]  activity = {"GateIn","Gate Out"};
+    String[]  activity = {"GateIn","Gate Out","Import","Export","Empty"};
     String[]  containerType = {"GateIn","Gate Out"};
-    String[]  containerSize = {"20","40"};
+    String[]  containerSize = {"20","40","45"};
     String[]  locations = {"Dadri","Mundra 1","Mundra 2"};
     String[]  surveyors = {"Durga","Varsha","Ganesh"};
-    String[]  containerStatus = {"Damaged","Gate Out"};
+    String[]  containerStatus = {"Damaged","Sound"};
     ArrayList<String>  containerNos = new ArrayList<String>();
 
     private Dialog dialog;
     ArrayAdapter<String> adapterItems;
     RecyclerView recyclerView;
     RecycleAdapter adapter;
-    ImageView icon;
+    ImageView galleryIcon,cameraIcon;
     ArrayList<Uri> uri = new ArrayList<Uri>();
     private static  final int Read_Permission = 101;
 
     EditText DateTime;
+    Uri cam_uri;
     AutoCompleteTextView containerNumberView,activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
 
 
@@ -67,37 +70,12 @@ public class UserFormActivity  extends AppCompatActivity {
         surveyorView= findViewById(R.id.autoComTVSurveyorNameList);
         conStatusView= findViewById(R.id.autoComTVConStatusList);
 
-        //Dialog to confirm the Container No
-        dialog = new Dialog(this);
-        dialog.setContentView(R.layout.custom_dialog_layout);
-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(getDrawable(R.drawable.custom_dialog_background));
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.setCancelable(false); //Optional
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //Setting the animations to dialog
-
-        Button Okay = dialog.findViewById(R.id.btn_okay);
-        Button Cancel = dialog.findViewById(R.id.btn_cancel);
-
-        Okay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UserFormActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        Cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        icon = findViewById(R.id.FolderIconImageView);
+        galleryIcon = findViewById(R.id.FolderIconImageView);
+        cameraIcon = findViewById(R.id.cameraIconImageView);
         recyclerView = findViewById(R.id.recyclerView_Gallery_Images);
 
         adapter = new RecycleAdapter(uri);
-        recyclerView.setLayoutManager(new GridLayoutManager(UserFormActivity.this,3));
+        recyclerView.setLayoutManager(new GridLayoutManager(UserFormActivity.this,2));
         recyclerView.setAdapter(adapter);
 
         if(ContextCompat.checkSelfPermission(UserFormActivity.this,android.Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -108,7 +86,7 @@ public class UserFormActivity  extends AppCompatActivity {
                     Read_Permission);
         }
 
-        icon.setOnClickListener(new View.OnClickListener() {
+        galleryIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -119,6 +97,19 @@ public class UserFormActivity  extends AppCompatActivity {
             }
         });
 
+        cameraIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera");
+                cam_uri = getApplicationContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cam_uri);
+                startActivityForResult(cameraIntent,123);
+            }
+        });
+
         //Container Number
         Intent intent = getIntent();
         containerNos = intent.getStringArrayListExtra("cno");
@@ -126,8 +117,6 @@ public class UserFormActivity  extends AppCompatActivity {
         if(!containerNos.isEmpty())
         {
             containerNumberView.setText(containerNos.get(0));
-            TextView t = dialog.findViewById(R.id.conMsg);
-            t.setText(containerNumberView.getText().toString());
         }
 
         //Time
@@ -210,32 +199,107 @@ public class UserFormActivity  extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 String item = adapterView.getItemAtPosition(position).toString();
-                conStatusView.setText(item, false);
+                //custom Toast
+                LayoutInflater inflater = getLayoutInflater();
+                View customToastLayout = inflater.inflate(R.layout.activity_custom_toast,(ViewGroup) findViewById(R.id.custom_toast_container));
+                TextView txtMessage = customToastLayout.findViewById(R.id.text);
+                Toast mToast = new Toast(getApplicationContext());
+                mToast.setDuration(Toast.LENGTH_LONG);
+                mToast.setView(customToastLayout);
+
                 if(item.equals("Damaged"))
                 {
-                    Intent intent = new Intent(UserFormActivity.this, DamagedContainerActivity.class);
-                    startActivity(intent);
-                }
+                    if(CheckAllFields()) {
+                        CameraActivity camAct = new CameraActivity();
+                        if(camAct.isValidContainerNumber(containerNumberView.getText().toString()))
+                        {
+                            conStatusView.setText(item, false);
+                            dialog = createDialog("Damaged");
+                            TextView t = dialog.findViewById(R.id.conMsg);
+                            t.setText(containerNumberView.getText().toString());
+                            dialog.show();
+                        }
+                        else
+                        {
+                            txtMessage.setText("Please enter the valid Container number");
+                            mToast.show();
+                        }
 
+                    }
+                    else {
+                        conStatusView.setText("");
+                        txtMessage.setText("All Fields are required");
+                        mToast.show();
+                    }
+                }
             }
         });
+    }
+
+    public Dialog createDialog(String conStatus)
+    {
+        //Dialog to confirm the Container No
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_dialog_layout);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(getDrawable(R.drawable.custom_dialog_background));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(false); //Optional
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //Setting the animations to dialog
+
+        Button Okay = dialog.findViewById(R.id.btn_okay);
+        Button Cancel = dialog.findViewById(R.id.btn_cancel);
+
+        Okay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent;
+                if(conStatus.equals("Damaged"))
+                {
+                    intent = new Intent(UserFormActivity.this, DamagedContainerActivity.class);
+                }
+                else
+                {
+                    intent = new Intent(UserFormActivity.this, MainActivity.class);
+                }
+
+                startActivity(intent);
+            }
+        });
+
+        Cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        return dialog;
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1 & resultCode == Activity.RESULT_OK){
-            if(data.getClipData()!=null)
+        if((requestCode==1 || requestCode == 123) & resultCode == Activity.RESULT_OK){
+            if(data!=null)
             {
-                int x= data.getClipData().getItemCount();
-                for(int i=0;i<x;i++){
-                    uri.add(data.getClipData().getItemAt(i).getUri());
+                if(data.getClipData()!=null)
+                {
+                    int x= data.getClipData().getItemCount();
+                    for(int i=0;i<x;i++){
+                        uri.add(data.getClipData().getItemAt(i).getUri());
+                        adapter.notifyDataSetChanged();
+                    }
                 }
-                adapter.notifyDataSetChanged();
+                else if(data.getData()!=null) {
+                    String imageURL = data.getData().getPath();
+                    uri.add(Uri.parse(imageURL));
+                }
             }
-            if(data.getData()!=null){
-                String imageURL = data.getData().getPath();
-                uri.add(Uri.parse(imageURL));
+            else
+            {
+                uri.add(cam_uri);
+                adapter.notifyDataSetChanged();
             }
         }
     }
@@ -258,7 +322,19 @@ public class UserFormActivity  extends AppCompatActivity {
         {
             if(recyclerView.getAdapter().getItemCount()>0)
             {
-                dialog.show();
+                CameraActivity camAct = new CameraActivity();
+                if(camAct.isValidContainerNumber(containerNumberView.getText().toString()))
+                {
+                    dialog = createDialog("Sound");
+                    TextView t = dialog.findViewById(R.id.conMsg);
+                    t.setText(containerNumberView.getText().toString());
+                    dialog.show();
+                }
+                else
+                {
+                    txtMessage.setText("Please enter the valid Container number");
+                    mToast.show();
+                }
             }
             else
             {

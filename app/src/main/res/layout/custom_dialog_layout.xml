@@ -7,6 +7,28 @@
     android:background="@android:color/white"
     android:orientation="vertical"
     android:layout_gravity="center">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@color/AirForceBlue">
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="50dp"
+            android:background="@color/AirForceBlue"
+            app:srcCompat="@drawable/warning" />
+        <TextView
+            android:id="@+id/checkMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/checkMsg"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="normal" />
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/textView"
@@ -26,7 +48,7 @@
         android:textColor="@color/AirForceBlue"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:text="Vidhya">
+        android:text="">
     </TextView>
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,7 +92,7 @@
             android:text="Cancel"
             android:textSize="18sp"
             android:textAllCaps="false"
-            android:textColor="@android:color/holo_blue_dark"/>
+            android:textColor="@color/Red"/>
         <Button
             android:id="@+id/btn_okay"
             android:layout_width="wrap_content"
@@ -80,6 +102,6 @@
             android:text="Continue"
             android:textSize="18sp"
             android:textAllCaps="false"
-            android:textColor="@android:color/holo_blue_dark" />
+            android:textColor="@color/AirForceBlue" />
     </LinearLayout>
 </LinearLayout>

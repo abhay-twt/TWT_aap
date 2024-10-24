@@ -1,9 +1,11 @@
 package com.example.photoapp;
 import java.util.ArrayList;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.SparseArray;
@@ -17,7 +19,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
+import androidx.annotation.RequiresExtension;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
@@ -26,9 +28,11 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class CameraActivity extends AppCompatActivity {
-    ActivityResultLauncher<Intent> resultLauncher;
+    ActivityResultLauncher<Intent> galleryResultLauncher,cameraResultLauncher;
     ArrayList<String> validContainerNumbers = new ArrayList<>();
     boolean flag = false;
+    Uri cam_uri;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,48 +40,37 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         registerResult();
     }
+
     public void captureImage(View view) {
-        Intent open_camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(open_camera,123);
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try{
-
-            if (requestCode == 123) {
-                Bitmap photo = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
-                ImageView capturedImageView = findViewById(R.id.cameraImageView);
-                capturedImageView.setImageBitmap(photo);
-                flag = true;
-                validContainerNumbers = getValidContainerNumbersFromImage(photo);
-            }
-        }
-        catch (Exception e)
-        {
-            Toast.makeText(CameraActivity.this,"No Image Selected",Toast.LENGTH_SHORT).show();
-        }
-
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera");
+        cam_uri = getApplicationContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cam_uri);
+        cameraResultLauncher.launch(cameraIntent);
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.R, version = 2)
     public void imageFromGallery(View view) {
         Intent intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
-        resultLauncher.launch(intent);
+        galleryResultLauncher.launch(intent);
     }
 
     public void registerResult(){
-        resultLauncher = registerForActivityResult(
+        galleryResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         try{
-                            Uri imageUri = result.getData().getData();
+                            assert result.getData() != null;
+                            cam_uri = result.getData().getData();
                             ContentResolver contentResolver = getContentResolver();
                             ImageView capturedImageView = findViewById(R.id.cameraImageView);
-                            assert imageUri != null;
-                            Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver , imageUri);
-                            capturedImageView.setImageURI(imageUri);
+                            assert cam_uri != null;
+                            Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver,cam_uri);
+                            capturedImageView.setImageBitmap(photo);
                             flag = true;
                             validContainerNumbers = getValidContainerNumbersFromImage(photo);
                         }
@@ -88,6 +81,31 @@ public class CameraActivity extends AppCompatActivity {
                     }
                 }
         );
+
+
+        cameraResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    try
+                    {
+                        if (result.getResultCode() == RESULT_OK) {
+                            // There are no request codes
+                            ImageView capturedImageView = findViewById(R.id.cameraImageView);
+                            capturedImageView.setImageURI(cam_uri);
+                            flag = true;
+                            ContentResolver contentResolver = getContentResolver();
+                            Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver,cam_uri);
+                            validContainerNumbers = getValidContainerNumbersFromImage(photo);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Toast.makeText(CameraActivity.this,"No Image Selected",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
     }
 
     // Function to extract and validate container numbers
@@ -214,7 +232,7 @@ public class CameraActivity extends AppCompatActivity {
 
     }
 
-    private boolean isValidContainerNumber(String container) {
+    public boolean isValidContainerNumber(String container) {
         if (container.length() != 11) return false;
 
         // Convert letters to numeric values and multiply by positional weights
@@ -254,7 +272,7 @@ public class CameraActivity extends AppCompatActivity {
     {
         ImageView capturedImageView = findViewById(R.id.cameraImageView);
 
-        if(flag == true)
+        if(flag)
         {
             Intent intent = new Intent(CameraActivity.this, UserFormActivity.class);
             intent.putStringArrayListExtra("cno",validContainerNumbers);
