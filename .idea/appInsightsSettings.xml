@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.photoapp" />
+                  <option name="mobileSdkAppId" value="1:482878314823:android:8b7aa470a97d1a743c1462" />
+                  <option name="projectId" value="twt-aap" />
+                  <option name="projectNumber" value="482878314823" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

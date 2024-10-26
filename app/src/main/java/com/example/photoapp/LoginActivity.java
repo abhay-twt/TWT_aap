@@ -8,15 +8,24 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
     /*one boolean variable to check whether all the text fields
         are filled by the user, properly or not.*/
     boolean isAllFieldsChecked = false;
-    EditText userName, passWord;
+    EditText userNameField, passWordField;
+    FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,8 +33,9 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         //Fetching All Fields
-        userName = findViewById(R.id.loginUsername);
-        passWord = findViewById(R.id.loginPassword);
+        userNameField = findViewById(R.id.loginUsername);
+        passWordField = findViewById(R.id.loginPassword);
+        db = FirebaseFirestore.getInstance();
     }
 
     public void goToCamera(View view) {
@@ -35,12 +45,55 @@ public class LoginActivity extends AppCompatActivity {
         Toast mToast = new Toast(getApplicationContext());
         mToast.setDuration(Toast.LENGTH_SHORT);
         mToast.setView(customToastLayout);
+
         isAllFieldsChecked = CheckAllFields();
 
         if(isAllFieldsChecked)
         {
-            Intent intent = new Intent(LoginActivity.this, CameraActivity.class);
-            startActivity(intent);
+            String userName = userNameField.getText().toString();
+            String passWord = passWordField.getText().toString();
+            try {
+                db.collection("users")
+                        .whereEqualTo("Username", userName)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful())
+                                {
+                                    QueryDocumentSnapshot document;
+                                    if(!task.getResult().isEmpty())
+                                    {
+                                        if(Objects.equals(task.getResult().getDocuments().get(0).get("Password"), passWord))
+                                        {
+                                            Intent intent = new Intent(LoginActivity.this, CameraActivity.class);
+                                            startActivity(intent);
+                                        }
+                                        else
+                                        {
+                                            txtMessage.setText("Invalid Password");
+                                            mToast.show();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        txtMessage.setText("Invalid Username");
+                                        mToast.show();
+                                    }
+                                }
+                                else
+                                {
+                                    txtMessage.setText((CharSequence) task.getException());
+                                    mToast.show();
+                                }
+                            }
+                        });
+            }
+            catch (Exception ex)
+            {
+                txtMessage.setText("DB Error");
+                mToast.show();
+            }
         }
         else
         {
@@ -53,11 +106,11 @@ public class LoginActivity extends AppCompatActivity {
     private boolean CheckAllFields() {
 
         boolean retValue = true;
-        if (userName.length() == 0) {
+        if (userNameField.length() == 0) {
 
             return false;
         }
-        if (passWord.length() == 0) {
+        if (passWordField.length() == 0) {
 
             return false;
         }
