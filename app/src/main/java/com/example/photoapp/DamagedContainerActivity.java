@@ -29,7 +29,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     RecycleAdapter adapter;
-    ImageView galleryIcon,cameraIcon;
+    ImageView galleryIcon,cameraIcon,shareIcon;
     ArrayList<Uri> uri = new ArrayList<Uri>();
     private static  final int Read_Permission = 101;
     EditText remark;
@@ -42,6 +42,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
 
         galleryIcon = findViewById(R.id.FolderIconImageView);
         cameraIcon = findViewById(R.id.cameraIconImageView);
+        shareIcon = findViewById(R.id.ShareIconImageView);
         recyclerView = findViewById(R.id.recyclerView_Gallery_Images);
         remark = findViewById(R.id.editTextMultiLine);
 
@@ -78,6 +79,17 @@ public class DamagedContainerActivity extends AppCompatActivity {
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cam_uri);
                 startActivityForResult(cameraIntent,123);
+            }
+        });
+
+        shareIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uri);
+                shareIntent.setType("image/*");
+                startActivity(Intent.createChooser(shareIntent, null));
             }
         });
     }
@@ -141,6 +153,8 @@ public class DamagedContainerActivity extends AppCompatActivity {
         }
 
     }
+
+
 
     private boolean CheckAllFields() {
 

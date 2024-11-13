@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@color/white"
         >
         <TextView
             android:id="@+id/cameraAppNameTextView"
@@ -85,19 +86,33 @@
             android:layout_height="match_parent"
             android:scrollbarStyle="outsideInset"
             android:scrollbars="vertical"
+            android:background="@color/white"
             android:layout_marginTop="5dp"
             android:padding="5dp"/>
-        <Button
-            android:id="@+id/NextButton"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/AirForceBlue"
-            android:text="Next"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:cornerRadius="200dp"
             android:layout_marginTop="30dp"
-            android:layout_gravity="center_horizontal"
-            android:onClick="moveToNext"/>
+            android:layout_marginLeft="70dp">
+            <ImageView
+                android:id="@+id/ShareIconImageView"
+                android:layout_width="71dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="50dp"
+                app:srcCompat="@drawable/share" />
+            <Button
+                android:id="@+id/NextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/AirForceBlue"
+                android:text="Next"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:cornerRadius="200dp"
+                android:layout_gravity="center_horizontal"
+                android:onClick="moveToNext"/>
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>
