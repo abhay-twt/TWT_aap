@@ -56,7 +56,7 @@ public class UserFormActivity  extends AppCompatActivity {
     ArrayList<Uri> uri = new ArrayList<Uri>();
     private static  final int Read_Permission = 101;
 
-    EditText DateTime;
+    EditText dateTime;
     Uri cam_uri;
     AutoCompleteTextView shippingLineTextView,containerNumberView,activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
     TextView remark ;
@@ -87,7 +87,8 @@ public class UserFormActivity  extends AppCompatActivity {
         recyclerView.setLayoutManager(new GridLayoutManager(UserFormActivity.this,2));
         recyclerView.setAdapter(adapter);
 
-        if(ContextCompat.checkSelfPermission(UserFormActivity.this,android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        loadSurveyorList();
+        if(ContextCompat.checkSelfPermission(UserFormActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
         != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(UserFormActivity.this,
@@ -142,6 +143,9 @@ public class UserFormActivity  extends AppCompatActivity {
         //Activity
         setDropdowns(activityView,activity);
 
+        //Shipping Line
+        setDropdowns(shippingLineTextView,shippingLine);
+
         //Container Type
         setDropdowns(conTypeView,containerType);
 
@@ -150,8 +154,6 @@ public class UserFormActivity  extends AppCompatActivity {
 
         //Locations
         setDropdowns(locView,locations);
-        //Surveyors
-        setDropdowns(surveyorView,surveyors);
 
         //Container Status
         setDropdowns(conStatusView,containerStatus);
