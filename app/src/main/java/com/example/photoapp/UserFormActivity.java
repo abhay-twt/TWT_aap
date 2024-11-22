@@ -1,4 +1,5 @@
 package com.example.photoapp;
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
@@ -18,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -26,21 +26,27 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class UserFormActivity  extends AppCompatActivity {
 
-    String[]  activity = {"GateIn","Gate Out","Import","Export","Empty"};
-    String[]  containerType = {"GateIn","Gate Out"};
+    String[]  activity = {"Import GateIn","Import GateOut","Export GateIn","Export GateOut","Empty GateIn","Empty GateOut"};
+    String[]  containerType = {"Standard","Refrigerated","OpenTop"};
     String[]  containerSize = {"20","40","45"};
-    String[]  locations = {"Dadri","Mundra 1","Mundra 2"};
-    String[]  surveyors = {"Durga","Varsha","Ganesh"};
+    String[]  locations = {"Dadri","Mundra_1","Mundra_2","Kolkata","Veshvi","Mundra Empty Park"};
+    ArrayList<String>  surveyors = new ArrayList<String>();
     String[]  containerStatus = {"Damaged","Sound"};
+    String[]  shippingLine = {"ML","MSC","CCG","OOCL"};
     ArrayList<String>  containerNos = new ArrayList<String>();
+    String[] loadedSurveyors;
 
     private Dialog dialog;
     ArrayAdapter<String> adapterItems;
@@ -52,23 +58,26 @@ public class UserFormActivity  extends AppCompatActivity {
 
     EditText DateTime;
     Uri cam_uri;
-    AutoCompleteTextView containerNumberView,activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
-
+    AutoCompleteTextView shippingLineTextView,containerNumberView,activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
+    TextView remark ;
+    String selectedLocation;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_form);
 
         containerNumberView = findViewById(R.id.autoCompleteTextContainerNo);
-        DateTime = findViewById(R.id.dateTime);
+        dateTime = findViewById(R.id.dateTime);
         activityView  = findViewById(R.id.autoCompleteTextViewActivity);
         conTypeView= findViewById(R.id.autoComTVContTypeList);
         conSizeView= findViewById(R.id.autoComTVContSizeList);
         locView= findViewById(R.id.autoComTVLocationList);
         surveyorView= findViewById(R.id.autoComTVSurveyorNameList);
         conStatusView= findViewById(R.id.autoComTVConStatusList);
+        remark = findViewById(R.id.remarkTextView);
+        shippingLineTextView = findViewById(R.id.autoComShippingLine);
 
         galleryIcon = findViewById(R.id.FolderIconImageView);
         cameraIcon = findViewById(R.id.cameraIconImageView);
@@ -82,7 +91,7 @@ public class UserFormActivity  extends AppCompatActivity {
         != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(UserFormActivity.this,
-                    new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     Read_Permission);
         }
 
@@ -122,8 +131,8 @@ public class UserFormActivity  extends AppCompatActivity {
         //Time
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
-        DateTime.setText(dtf.format(now));
-        DateTime.setEnabled(false);
+        dateTime.setText(dtf.format(now));
+        dateTime.setEnabled(false);
 
         //Container Number
         String[] cnos = new String[containerNos.size()];
@@ -179,11 +188,14 @@ public class UserFormActivity  extends AppCompatActivity {
             }
         });
 
-        locView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        locView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 String item = adapterView.getItemAtPosition(position).toString();
                 locView.setText(item, false);
+                selectedLocation = item;
+                loadSurveyorList();
             }
         });
 
@@ -201,32 +213,27 @@ public class UserFormActivity  extends AppCompatActivity {
                 String item = adapterView.getItemAtPosition(position).toString();
                 //custom Toast
                 LayoutInflater inflater = getLayoutInflater();
-                View customToastLayout = inflater.inflate(R.layout.activity_custom_toast,(ViewGroup) findViewById(R.id.custom_toast_container));
+                View customToastLayout = inflater.inflate(R.layout.activity_custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
                 TextView txtMessage = customToastLayout.findViewById(R.id.text);
                 Toast mToast = new Toast(getApplicationContext());
                 mToast.setDuration(Toast.LENGTH_LONG);
                 mToast.setView(customToastLayout);
 
-                if(item.equals("Damaged"))
-                {
-                    if(CheckAllFields()) {
+                if (item.equals("Damaged")) {
+                    if (CheckAllFields()) {
                         CameraActivity camAct = new CameraActivity();
-                        if(camAct.isValidContainerNumber(containerNumberView.getText().toString()))
-                        {
+                        if (camAct.isValidContainerNumber(containerNumberView.getText().toString())) {
                             conStatusView.setText(item, false);
                             dialog = createDialog("Damaged");
                             TextView t = dialog.findViewById(R.id.conMsg);
                             t.setText(containerNumberView.getText().toString());
                             dialog.show();
-                        }
-                        else
-                        {
+                        } else {
                             txtMessage.setText("Please enter the valid Container number");
                             mToast.show();
                         }
 
-                    }
-                    else {
+                    } else {
                         conStatusView.setText("");
                         txtMessage.setText("All Fields are required");
                         mToast.show();
@@ -236,10 +243,45 @@ public class UserFormActivity  extends AppCompatActivity {
         });
     }
 
+
+    public void loadSurveyorList()
+    {
+
+        LayoutInflater inflater = getLayoutInflater();
+        View customToastLayout = inflater.inflate(R.layout.activity_custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView txtMessage = customToastLayout.findViewById(R.id.text);
+        Toast mToast = new Toast(getApplicationContext());
+        mToast.setDuration(Toast.LENGTH_LONG);
+        mToast.setView(customToastLayout);
+
+        try {
+            if (selectedLocation != null) {
+
+                DBHelper.LoadSurveyors(new MySurveyorsCallback() {
+                    @Override
+                    public void onCallback(ArrayList<String> arrayList) {
+                        surveyors = arrayList;
+                        if (surveyors != null) {
+                            loadedSurveyors = new String[surveyors.size()];
+                            loadedSurveyors = surveyors.toArray(loadedSurveyors);
+                            setDropdowns(surveyorView, loadedSurveyors);
+                        }
+                    }
+                }, selectedLocation);
+
+
+            }
+        } catch (Exception ex) {
+            txtMessage.setText("Error in Loading Surveyors list");
+            mToast.show();
+        }
+
+    }
+
     public Dialog createDialog(String conStatus)
     {
         //Dialog to confirm the Container No
-        dialog = new Dialog(this);
+        dialog = new Dialog(UserFormActivity.this);
         dialog.setContentView(R.layout.custom_dialog_layout);
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(getDrawable(R.drawable.custom_dialog_background));
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -253,16 +295,15 @@ public class UserFormActivity  extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent;
-                if(conStatus.equals("Damaged"))
-                {
-                    intent = new Intent(UserFormActivity.this, DamagedContainerActivity.class);
-                }
-                else
-                {
-                    intent = new Intent(UserFormActivity.this, MainActivity.class);
-                }
+                if (conStatus.equals("Damaged")) {
 
-                startActivity(intent);
+                    HashMap<String, Object> Activity = getFilledData(conStatus);
+                    intent = new Intent(UserFormActivity.this, DamagedContainerActivity.class);
+                    intent.putExtra("map", Activity);
+                    startActivity(intent);
+                } else {
+                    saveData();
+                }
             }
         });
 
@@ -277,85 +318,125 @@ public class UserFormActivity  extends AppCompatActivity {
 
     }
 
+    public void saveData()
+    {
+        LayoutInflater inflater = getLayoutInflater();
+        View customToastLayout = inflater.inflate(R.layout.activity_custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
+        TextView txtMessage = customToastLayout.findViewById(R.id.text);
+        Toast mToast = new Toast(getApplicationContext());
+        mToast.setDuration(Toast.LENGTH_LONG);
+        mToast.setView(customToastLayout);
+        //GoogleDriveHelperClass.GenerateLinkForImages();
+
+        Map<String, Object> Activity = getFilledData("damaged");
+
+        DBHelper.SaveDetails(new MySaveCallBack() {
+            @Override
+            public void onCallbackForSaveData(boolean status) {
+                if (status) {
+                    Toast.makeText(UserFormActivity.this, "Data saved", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(UserFormActivity.this, CameraActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(UserFormActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, Activity);
+    }
+
+    public HashMap<String, Object> getFilledData(String conStatus)
+    {
+
+        HashMap<String, Object> Activity = new HashMap<>();
+        Activity.put("ContainerNumber", containerNumberView.getText().toString());
+        Activity.put("ContainerStatus", conStatusView.getText().toString());
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
+        Activity.put("CreatedTime", new Timestamp(Instant.now()));
+        Activity.put("GateStatus", activityView.getText().toString());
+        Activity.put("ImageLink", "https://in.search.yahoo.com/yhs/search?p=transworld%20terminals.com&hspart=fc&hsimp=yhs-2461&type=fc_A7B54195D6A_s58_g_e_d040624_n9998_c999&param1=7&param2=eJwtj8tugzAQRX%2FFy0QKZPzAxmbVUPcDqq4aZQHGIRZPARVVv77jtPLmzJ3j0Uwbmmtxe3%2BlAELncD3dRqy11jlibIEAyQQW7i9HCjMiw9woAWCcMJJ7ZXjDa6OavDaN0sxUjke59RPaYUT8qpCG6Sf0fXXOUiCHPYzNtK9k3AiFFAqCgRQF%2BZbiSKp57v3u6y5s54yrlEty6B7b0J9IHzpPWu%2B66UjcY5kGf6YcB8RH1upeLeH%2FS1x3fd4YF1j98mRNwVpbQsKtUgml9i3JXy4ysTQrgemSW7hE30WZARMJoAYfIIxQJmOpEvnnL7YqWfo%3D");
+        Activity.put("Location", locView.getText().toString());
+        Activity.put("Size", conSizeView.getText().toString());
+        Activity.put("Surveyor", surveyorView.getText().toString());
+        Activity.put("UpdatedTime", new Timestamp(Instant.now()));
+        Activity.put("ShippingLine", "HAPAG");
+        if (!conStatus.equals("Damaged")) {
+            Activity.put("Remark", remark.getText().toString());
+        }
+        return Activity;
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
-        if((requestCode==1 || requestCode == 123) & resultCode == Activity.RESULT_OK){
-            if(data!=null)
-            {
-                if(data.getClipData()!=null)
-                {
-                    int x= data.getClipData().getItemCount();
-                    for(int i=0;i<x;i++){
+        if ((requestCode == 1 || requestCode == 123) & resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                if (data.getClipData() != null) {
+                    int x = data.getClipData().getItemCount();
+                    for (int i = 0; i < x; i++) {
                         uri.add(data.getClipData().getItemAt(i).getUri());
                         adapter.notifyDataSetChanged();
                     }
-                }
-                else if(data.getData()!=null) {
+                } else if (data.getData() != null) {
                     String imageURL = data.getData().getPath();
                     uri.add(Uri.parse(imageURL));
                 }
-            }
-            else
-            {
+            } else {
                 uri.add(cam_uri);
                 adapter.notifyDataSetChanged();
             }
         }
     }
 
-    private void setDropdowns(AutoCompleteTextView autoCompleteTextView, String[] values) {
-        adapterItems = new ArrayAdapter<String>(this,R.layout.list_item,values);
+    public void setDropdowns(AutoCompleteTextView autoCompleteTextView, String[] values)
+    {
+        adapterItems = new ArrayAdapter<String>(this, R.layout.list_item, values);
         autoCompleteTextView.setAdapter(adapterItems);
     }
 
-    public void moveToNext(View view) {
+    public void moveToNext(View view)
+    {
 
         LayoutInflater inflater = getLayoutInflater();
-        View customToastLayout = inflater.inflate(R.layout.activity_custom_toast,(ViewGroup) findViewById(R.id.custom_toast_container));
+        View customToastLayout = inflater.inflate(R.layout.activity_custom_toast, (ViewGroup) findViewById(R.id.custom_toast_container));
         TextView txtMessage = customToastLayout.findViewById(R.id.text);
         Toast mToast = new Toast(getApplicationContext());
         mToast.setDuration(Toast.LENGTH_LONG);
         mToast.setView(customToastLayout);
 
-        if(CheckAllFields())
-        {
-            if(recyclerView.getAdapter().getItemCount()>0)
-            {
+        if (CheckAllFields()) {
+            if (recyclerView.getAdapter().getItemCount() > 0) {
                 CameraActivity camAct = new CameraActivity();
-                if(camAct.isValidContainerNumber(containerNumberView.getText().toString()))
-                {
+                if (camAct.isValidContainerNumber(containerNumberView.getText().toString())) {
                     dialog = createDialog("Sound");
                     TextView t = dialog.findViewById(R.id.conMsg);
                     t.setText(containerNumberView.getText().toString());
                     dialog.show();
-                }
-                else
-                {
+                } else {
                     txtMessage.setText("Please enter the valid Container number");
                     mToast.show();
                 }
-            }
-            else
-            {
+            } else {
                 txtMessage.setText("Please upload atleast 1 image to continue");
                 mToast.show();
             }
-        }
-        else {
+        } else {
             txtMessage.setText("All Fields are required");
             mToast.show();
         }
 
     }
 
-    private boolean CheckAllFields() {
+    private boolean CheckAllFields()
+    {
         boolean retValue = true;
-        if(DateTime.length() == 0) {
+        if (dateTime.length() == 0) {
             return false;
         }
 
-        if(containerNumberView.getText().toString().isEmpty() || activityView.getText().toString().isEmpty() || locView.getText().toString().isEmpty()  || surveyorView.getText().toString().isEmpty()  || conTypeView.getText().toString().isEmpty()  || conSizeView.getText() .toString().isEmpty() || conStatusView.getText().toString().isEmpty())
+        if (containerNumberView.getText().toString().isEmpty() || activityView.getText().toString().isEmpty() || locView.getText().toString().isEmpty() || surveyorView.getText().toString().isEmpty() || conTypeView.getText().toString().isEmpty() || conSizeView.getText().toString().isEmpty() || conStatusView.getText().toString().isEmpty())
         {
             return false;
         }

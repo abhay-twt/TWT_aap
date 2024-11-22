@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.photoapp" />
-                  <option name="mobileSdkAppId" value="1:482878314823:android:8b7aa470a97d1a743c1462" />
-                  <option name="projectId" value="twt-aap" />
-                  <option name="projectNumber" value="482878314823" />
+                  <option name="mobileSdkAppId" value="1:809558960988:android:6ca9ed2eed11b1d08aaf99" />
+                  <option name="projectId" value="twt-admin-panel" />
+                  <option name="projectNumber" value="809558960988" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

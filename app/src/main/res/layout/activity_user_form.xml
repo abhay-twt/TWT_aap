@@ -131,7 +131,6 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="330dp"
         android:layout_height="60dp"
@@ -140,6 +139,20 @@
         android:layout_gravity="center_horizontal">
         <AutoCompleteTextView
             android:id="@+id/autoComTVConStatusList"
+            android:layout_width="330dp"
+            android:layout_height="50dp"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="330dp"
+        android:layout_height="60dp"
+        android:hint="Shipping Line"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center_horizontal">
+        <AutoCompleteTextView
+            android:id="@+id/autoComShippingLine"
             android:layout_width="330dp"
             android:layout_height="50dp"
             android:inputType="text" />

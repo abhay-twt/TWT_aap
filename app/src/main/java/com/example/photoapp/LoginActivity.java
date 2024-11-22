@@ -53,8 +53,8 @@ public class LoginActivity extends AppCompatActivity {
             String userName = userNameField.getText().toString();
             String passWord = passWordField.getText().toString();
             try {
-                db.collection("users")
-                        .whereEqualTo("Username", userName)
+                db.collection("User")
+                        .whereEqualTo("UserName", userName)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override

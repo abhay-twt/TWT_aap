@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "482878314823",
-    "project_id": "twt-aap",
-    "storage_bucket": "twt-aap.appspot.com"
+    "project_number": "809558960988",
+    "project_id": "twt-admin-panel",
+    "storage_bucket": "twt-admin-panel.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:482878314823:android:8b7aa470a97d1a743c1462",
+        "mobilesdk_app_id": "1:809558960988:android:6ca9ed2eed11b1d08aaf99",
         "android_client_info": {
           "package_name": "com.example.photoapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAOuV_y3sIZB_fh-guAZkXB8ZFUfq0UiSg"
+          "current_key": "AIzaSyDHa19vjGEpqKAulX1pyeD7xInYCMbrRDE"
         }
       ],
       "services": {

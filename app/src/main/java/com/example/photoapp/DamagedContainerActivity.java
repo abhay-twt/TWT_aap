@@ -1,6 +1,5 @@
 package com.example.photoapp;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,8 +20,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class DamagedContainerActivity extends AppCompatActivity {
@@ -34,12 +33,15 @@ public class DamagedContainerActivity extends AppCompatActivity {
     private static  final int Read_Permission = 101;
     EditText remark;
     Uri cam_uri;
+    static HashMap<String, Object> Activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_damaged_container);
 
+        Intent intent = getIntent();
+        Activity = (HashMap<String, Object>)intent.getSerializableExtra("map");
         galleryIcon = findViewById(R.id.FolderIconImageView);
         cameraIcon = findViewById(R.id.cameraIconImageView);
         shareIcon = findViewById(R.id.ShareIconImageView);
@@ -98,7 +100,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if((requestCode==1 || requestCode == 123) & resultCode == Activity.RESULT_OK){
+        if((requestCode==1 || requestCode == 123) & resultCode == android.app.Activity.RESULT_OK){
             if(data!=null)
             {
                 if(data.getClipData()!=null)
@@ -137,8 +139,20 @@ public class DamagedContainerActivity extends AppCompatActivity {
         {
             if(Objects.requireNonNull(recyclerView.getAdapter()).getItemCount()>0)
             {
-                Intent intent = new Intent(DamagedContainerActivity.this, MainActivity.class);
-                startActivity(intent);
+                Activity.put("Remark",remark.getText().toString());
+                DBHelper.SaveDetails(new MySaveCallBack() {
+                    @Override
+                    public void onCallbackForSaveData(boolean status) {
+                        if (status) {
+                            Toast.makeText(DamagedContainerActivity.this, "Data saved", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(DamagedContainerActivity.this, CameraActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(DamagedContainerActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                }, Activity);
             }
             else
             {
