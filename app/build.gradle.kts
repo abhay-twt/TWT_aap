@@ -6,6 +6,8 @@ plugins {
 android {
     namespace = "com.example.photoapp"
     compileSdk = 34
+    useLibrary("org.apache.http.legacy")
+
 
     defaultConfig {
         applicationId = "com.example.photoapp"
@@ -29,6 +31,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    packagingOptions {
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE")
+        exclude("META-INF/LICENSE.txt")
+        exclude("META-INF/license.txt")
+        exclude("META-INF/NOTICE")
+        exclude("META-INF/NOTICE.txt")
+        exclude("META-INF/notice.txt")
+        exclude("META-INF/ASL2.0")
+        exclude("META-INF/*.kotlin_module")
     }
 }
 
@@ -59,4 +72,11 @@ android {
         // For example, add the dependencies for Firebase Authentication and Cloud Firestore
         implementation("com.google.firebase:firebase-auth")
         implementation("com.google.firebase:firebase-firestore")
+
+        implementation("com.google.android.gms:play-services-auth:20.5.0")
+        implementation("com.google.api-client:google-api-client-android:1.33.0")
+        implementation("com.google.apis:google-api-services-drive:v3-rev136-1.25.0")
+        implementation("com.google.http-client:google-http-client-gson:1.19.0")
+        implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+
     }

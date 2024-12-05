@@ -1,4 +1,5 @@
 package com.example.photoapp;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
@@ -8,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,14 +28,12 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
-import java.time.Instant;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class UserFormActivity  extends AppCompatActivity {
@@ -53,7 +53,7 @@ public class UserFormActivity  extends AppCompatActivity {
     RecyclerView recyclerView;
     RecycleAdapter adapter;
     ImageView galleryIcon,cameraIcon;
-    ArrayList<Uri> uri = new ArrayList<Uri>();
+    ArrayList<Uri> uri = new ArrayList<>();
     private static  final int Read_Permission = 101;
 
     EditText dateTime;
@@ -61,6 +61,7 @@ public class UserFormActivity  extends AppCompatActivity {
     AutoCompleteTextView shippingLineTextView,containerNumberView,activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
     TextView remark ;
     String selectedLocation;
+    private GoogleDriveHelper googleDriveHelper;
 
 
     @Override
@@ -328,23 +329,18 @@ public class UserFormActivity  extends AppCompatActivity {
         Toast mToast = new Toast(getApplicationContext());
         mToast.setDuration(Toast.LENGTH_LONG);
         mToast.setView(customToastLayout);
-        //GoogleDriveHelperClass.GenerateLinkForImages();
-
-        Map<String, Object> Activity = getFilledData("damaged");
-
-        DBHelper.SaveDetails(new MySaveCallBack() {
+        googleDriveHelper.signIn(new MySaveCallBack() {
             @Override
-            public void onCallbackForSaveData(boolean status) {
-                if (status) {
-                    Toast.makeText(UserFormActivity.this, "Data saved", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(UserFormActivity.this, CameraActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(UserFormActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+            public void onCallbackForSaveData(boolean status)
+            {
+                if(status) {
+                }
+                else {
+                    Toast.makeText(UserFormActivity.this, "Google Drive Error!", Toast.LENGTH_SHORT).show();
                 }
 
             }
-        }, Activity);
+        });
     }
 
     public HashMap<String, Object> getFilledData(String conStatus)
@@ -357,7 +353,6 @@ public class UserFormActivity  extends AppCompatActivity {
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
         Activity.put("CreatedTime", d.format(now).toString());//new Timestamp(Instant.now())
         Activity.put("GateStatus", activityView.getText().toString());
-        Activity.put("ImageLink", "https://in.search.yahoo.com/yhs/search?p=transworld%20terminals.com&hspart=fc&hsimp=yhs-2461&type=fc_A7B54195D6A_s58_g_e_d040624_n9998_c999&param1=7&param2=eJwtj8tugzAQRX%2FFy0QKZPzAxmbVUPcDqq4aZQHGIRZPARVVv77jtPLmzJ3j0Uwbmmtxe3%2BlAELncD3dRqy11jlibIEAyQQW7i9HCjMiw9woAWCcMJJ7ZXjDa6OavDaN0sxUjke59RPaYUT8qpCG6Sf0fXXOUiCHPYzNtK9k3AiFFAqCgRQF%2BZbiSKp57v3u6y5s54yrlEty6B7b0J9IHzpPWu%2B66UjcY5kGf6YcB8RH1upeLeH%2FS1x3fd4YF1j98mRNwVpbQsKtUgml9i3JXy4ysTQrgemSW7hE30WZARMJoAYfIIxQJmOpEvnnL7YqWfo%3D");
         Activity.put("Location", locView.getText().toString());
         Activity.put("Size", conSizeView.getText().toString());
         Activity.put("Surveyor", surveyorView.getText().toString());
@@ -365,7 +360,8 @@ public class UserFormActivity  extends AppCompatActivity {
         Activity.put("ShippingLine", shippingLineTextView.getText().toString());
         if (!conStatus.equals("Damaged")) {
             Activity.put("Remark", remark.getText().toString());
-        }
+        };
+        Activity.put("ImageLink", "https://in.search.yahoo.com/yhs/search?p=transworld%20terminals.com&hspart=fc&hsimp=yhs-2461&type=fc_A7B54195D6A_s58_g_e_d040624_n9998_c999&param1=7&param2=eJwtj8tugzAQRX%2FFy0QKZPzAxmbVUPcDqq4aZQHGIRZPARVVv77jtPLmzJ3j0Uwbmmtxe3%2BlAELncD3dRqy11jlibIEAyQQW7i9HCjMiw9woAWCcMJJ7ZXjDa6OavDaN0sxUjke59RPaYUT8qpCG6Sf0fXXOUiCHPYzNtK9k3AiFFAqCgRQF%2BZbiSKp57v3u6y5s54yrlEty6B7b0J9IHzpPWu%2B66UjcY5kGf6YcB8RH1upeLeH%2FS1x3fd4YF1j98mRNwVpbQsKtUgml9i3JXy4ysTQrgemSW7hE30WZARMJoAYfIIxQJmOpEvnnL7YqWfo%3D");
         return Activity;
     }
 
@@ -390,7 +386,83 @@ public class UserFormActivity  extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         }
+        else if (requestCode == 2 & resultCode == Activity.RESULT_OK) {
+            googleDriveHelper.handleSignInResult(new MySaveCallBack(){
+                @Override
+                public void onCallbackForSaveData(boolean status)
+                {
+                    if(status)
+                    {
+                        try {
+
+                            DateTimeFormatter d = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss a");
+                            LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
+                            String folderName = locView.getText().toString()+"_"+containerNumberView.getText().toString()+"_"+d.format(now).toString();
+                            googleDriveHelper.createFolder(new MySaveCallBack(){
+                                @Override
+                                public void onCallbackForSaveData(boolean status)
+                                {
+                                    if(status)
+                                    {
+                                        if (uri!=null)
+                                        {
+                                            for (Uri u:uri)
+                                            {
+                                                File file = new File(u.getPath());
+                                                googleDriveHelper.uploadFileToDrive(new MySaveCallBack() {
+                                                    @Override
+                                                    public void onCallbackForSaveData(boolean status) {
+
+                                                    }
+                                                },file, folderName);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Toast.makeText(UserFormActivity.this,"Error in creating Folder in Google Drive" , Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+                            },folderName);
+
+
+                        }
+                        catch(Exception e)
+                        {
+                            Toast.makeText(UserFormActivity.this,"Error in creating Folder in Google Drive" , Toast.LENGTH_SHORT).show();
+                            Log.d("Drive",  e.toString());
+                        }
+                    }
+                    else
+                    {
+                        Toast.makeText(UserFormActivity.this,"Error in Sign In to the Google Account" , Toast.LENGTH_SHORT).show();
+
+                    }
+
+                }
+            },data);
+
+
+        }
+
+
     }
+
+
+/*private String getRealPathFromURI(Uri contentUri, Context a) {
+    String[] proj = { MediaStore.Images.Media.DATA };
+
+    Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+    cursor.moveToFirst();
+    int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+    String filePath = cursor.getString(columnIndex);
+    cursor.close();
+    return filePath;
+
+}*/
+
+
 
     public void setDropdowns(AutoCompleteTextView autoCompleteTextView, String[] values)
     {
