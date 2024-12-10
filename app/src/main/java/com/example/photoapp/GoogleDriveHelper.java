@@ -12,6 +12,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import com.google.api.services.drive.DriveScopes;
@@ -82,39 +83,37 @@ public class GoogleDriveHelper {
         }
     }
 
-    public void createFolder(MySaveCallBack mySaveCallBack, String folderName)
+    public void createFolder(CreateFolderCallBack createFolderCallBack, String folderName)
     {
         try
         {
-            new CreateFolder(new MySaveCallBack(){
+            new CreateFolder(new CreateFolderCallBack(){
                 @Override
-                public void onCallbackForSaveData(boolean status) {
-                    mySaveCallBack.onCallbackForSaveData(true);
+                public void onCallBackCreateFolder(boolean status,String folderId) {
+                    createFolderCallBack.onCallBackCreateFolder(status,folderId);
                 }
             },folderName,mDriveService).execute();
         }
         catch (Exception e)
         {
-            mySaveCallBack.onCallbackForSaveData(false);
+            createFolderCallBack.onCallBackCreateFolder(false,null);
         }
 
 
     }
 
-    public void uploadFileToDrive(MySaveCallBack mySaveCallBack, java.io.File filePath, String folderId) {
+    public void uploadFileToDrive(CreateFolderCallBack createFolderCallBack, File filePath, String folderId) {
         try {
 
-            new UploadFile(new MySaveCallBack(){
+            new UploadFile(new CreateFolderCallBack(){
                 @Override
-                public void onCallbackForSaveData(boolean status) {
-                    mySaveCallBack.onCallbackForSaveData(true);
+                public void onCallBackCreateFolder(boolean status,String folderId) {
+                    createFolderCallBack.onCallBackCreateFolder(status,folderId);
                 }
             },folderId,mDriveService,filePath).execute();
-            mySaveCallBack.onCallbackForSaveData(true);
-
         } catch (Exception e) {
             Log.e("Drive", "Error uploading file", e);
-            mySaveCallBack.onCallbackForSaveData(false);
+            createFolderCallBack.onCallBackCreateFolder(false,folderId);
         }
     }
 }

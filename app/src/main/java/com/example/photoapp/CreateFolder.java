@@ -5,17 +5,19 @@ import android.os.AsyncTask;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 
+import java.util.Collections;
+
 public class CreateFolder extends AsyncTask<String,Void,Void> {
 
     String folderName;
     Drive mDriveService;
-    MySaveCallBack mySaveCallBack;
+    CreateFolderCallBack createFolderCallBack;
 
-    CreateFolder(MySaveCallBack mySaveCallBack, String folderName, Drive mDriveService) {
+    CreateFolder(CreateFolderCallBack createFolderCallBack, String folderName, Drive mDriveService) {
         // list all the parameters like in normal class define
         this.folderName = folderName;
         this.mDriveService = mDriveService;
-        this.mySaveCallBack = mySaveCallBack;
+        this.createFolderCallBack = createFolderCallBack;
 
     }
     @Override
@@ -23,6 +25,7 @@ public class CreateFolder extends AsyncTask<String,Void,Void> {
     {
         File fileMetadata = new File();
         fileMetadata.setName(folderName);
+        fileMetadata.setParents(Collections.singletonList("root"));
         fileMetadata.setMimeType("application/vnd.google-apps.folder");
 
         if(mDriveService!=null) {
@@ -30,11 +33,12 @@ public class CreateFolder extends AsyncTask<String,Void,Void> {
                 File folder = mDriveService.files().create(fileMetadata)
                         .setFields("id")
                         .execute();
-                mySaveCallBack.onCallbackForSaveData(true);
+                String e = folder.getId();
+                createFolderCallBack.onCallBackCreateFolder(true,folder.getId());
 
             } catch (Exception e) {
                 String a = e.toString();
-                mySaveCallBack.onCallbackForSaveData(false);
+                createFolderCallBack.onCallBackCreateFolder(true,null);
             }
         }
         return null;

@@ -4,8 +4,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -28,12 +30,12 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class UserFormActivity  extends AppCompatActivity {
@@ -55,6 +57,7 @@ public class UserFormActivity  extends AppCompatActivity {
     ImageView galleryIcon,cameraIcon;
     ArrayList<Uri> uri = new ArrayList<>();
     private static  final int Read_Permission = 101;
+    String ImageLink = null;
 
     EditText dateTime;
     Uri cam_uri;
@@ -69,6 +72,7 @@ public class UserFormActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_form);
 
+        googleDriveHelper = new GoogleDriveHelper(this);
         containerNumberView = findViewById(R.id.autoCompleteTextContainerNo);
         dateTime = findViewById(R.id.dateTime);
         activityView  = findViewById(R.id.autoCompleteTextViewActivity);
@@ -334,6 +338,7 @@ public class UserFormActivity  extends AppCompatActivity {
             public void onCallbackForSaveData(boolean status)
             {
                 if(status) {
+
                 }
                 else {
                     Toast.makeText(UserFormActivity.this, "Google Drive Error!", Toast.LENGTH_SHORT).show();
@@ -361,7 +366,6 @@ public class UserFormActivity  extends AppCompatActivity {
         if (!conStatus.equals("Damaged")) {
             Activity.put("Remark", remark.getText().toString());
         };
-        Activity.put("ImageLink", "https://in.search.yahoo.com/yhs/search?p=transworld%20terminals.com&hspart=fc&hsimp=yhs-2461&type=fc_A7B54195D6A_s58_g_e_d040624_n9998_c999&param1=7&param2=eJwtj8tugzAQRX%2FFy0QKZPzAxmbVUPcDqq4aZQHGIRZPARVVv77jtPLmzJ3j0Uwbmmtxe3%2BlAELncD3dRqy11jlibIEAyQQW7i9HCjMiw9woAWCcMJJ7ZXjDa6OavDaN0sxUjke59RPaYUT8qpCG6Sf0fXXOUiCHPYzNtK9k3AiFFAqCgRQF%2BZbiSKp57v3u6y5s54yrlEty6B7b0J9IHzpPWu%2B66UjcY5kGf6YcB8RH1upeLeH%2FS1x3fd4YF1j98mRNwVpbQsKtUgml9i3JXy4ysTQrgemSW7hE30WZARMJoAYfIIxQJmOpEvnnL7YqWfo%3D");
         return Activity;
     }
 
@@ -398,9 +402,9 @@ public class UserFormActivity  extends AppCompatActivity {
                             DateTimeFormatter d = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss a");
                             LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
                             String folderName = locView.getText().toString()+"_"+containerNumberView.getText().toString()+"_"+d.format(now).toString();
-                            googleDriveHelper.createFolder(new MySaveCallBack(){
+                            googleDriveHelper.createFolder(new CreateFolderCallBack(){
                                 @Override
-                                public void onCallbackForSaveData(boolean status)
+                                public void onCallBackCreateFolder(boolean status,String folderId)
                                 {
                                     if(status)
                                     {
@@ -408,15 +412,34 @@ public class UserFormActivity  extends AppCompatActivity {
                                         {
                                             for (Uri u:uri)
                                             {
-                                                File file = new File(u.getPath());
-                                                googleDriveHelper.uploadFileToDrive(new MySaveCallBack() {
+                                                String filePath = getRealPathFromURI(u,UserFormActivity.this);                                                getRealPathFromURI(u,UserFormActivity.this);
+                                                java.io.File file = new java.io.File(filePath);
+                                                googleDriveHelper.uploadFileToDrive(new CreateFolderCallBack() {
                                                     @Override
-                                                    public void onCallbackForSaveData(boolean status) {
+                                                    public void onCallBackCreateFolder(boolean status,String folderId) {
+                                                        if(status)
+                                                        {
 
+                                                        }
                                                     }
-                                                },file, folderName);
+                                                },file, folderId);
                                             }
                                         }
+                                        Map<String, Object> Activity = getFilledData("Sound");
+                                        Activity.put("ImageLink","https://drive.google.com/drive/folders/"+folderId);
+                                        DBHelper.SaveDetails(new MySaveCallBack() {
+                                            @Override
+                                            public void onCallbackForSaveData(boolean status) {
+                                                if (status) {
+                                                    Toast.makeText(UserFormActivity.this, "Data saved", Toast.LENGTH_SHORT).show();
+                                                    Intent intent = new Intent(UserFormActivity.this, CameraActivity.class);
+                                                    startActivity(intent);
+                                                } else {
+                                                    Toast.makeText(UserFormActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                                }
+
+                                            }
+                                        }, Activity);
                                     }
                                     else
                                     {
@@ -450,17 +473,15 @@ public class UserFormActivity  extends AppCompatActivity {
     }
 
 
-/*private String getRealPathFromURI(Uri contentUri, Context a) {
+public String getRealPathFromURI(Uri contentUri, Context a) {
     String[] proj = { MediaStore.Images.Media.DATA };
-
     Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
     cursor.moveToFirst();
     int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
     String filePath = cursor.getString(columnIndex);
     cursor.close();
     return filePath;
-
-}*/
+    }
 
 
 

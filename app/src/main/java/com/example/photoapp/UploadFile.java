@@ -10,14 +10,14 @@ public class UploadFile extends AsyncTask<String,Void,Void> {
 
     String folderId;
     Drive mDriveService;
-    MySaveCallBack mySaveCallBack;
+    CreateFolderCallBack createFolderCallBack;
     java.io.File filePath;
 
-    UploadFile(MySaveCallBack mySaveCallBack, String folderId, Drive mDriveService,java.io.File file) {
+    UploadFile(CreateFolderCallBack createFolderCallBack, String folderId, Drive mDriveService, java.io.File file) {
         // list all the parameters like in normal class define
 
         this.mDriveService = mDriveService;
-        this.mySaveCallBack = mySaveCallBack;
+        this.createFolderCallBack = createFolderCallBack;
         this.filePath= file;
         this.folderId = folderId;
     }
@@ -25,20 +25,21 @@ public class UploadFile extends AsyncTask<String,Void,Void> {
     protected Void doInBackground(String... strings) {
         File fileMetadata = new File();
         fileMetadata.setName(filePath.getName());
-        fileMetadata.setParents(Collections.singletonList("Kolkata_FSCU9791365_2024/12/03 18:41:08 pm"));
+        fileMetadata.setParents(Collections.singletonList(folderId));
         FileContent mediaContent = new FileContent("image/jpeg",filePath);
         File uploadedFile = null;
         try {
-            Thread.sleep(10000);
             uploadedFile = mDriveService.files().create(fileMetadata, mediaContent)
                     .setFields("id")
                     .execute();
-            mySaveCallBack.onCallbackForSaveData(true);
+            createFolderCallBack.onCallBackCreateFolder(true,folderId);
+            Log.d("Drive", "File uploaded with ID: " + uploadedFile.getId());
         } catch (Exception e) {
-            mySaveCallBack.onCallbackForSaveData(false);
+            Log.d("Drive", "File uploaded with ID: "+e.toString());
+            createFolderCallBack.onCallBackCreateFolder(false,null);
         }
 
-        Log.d("Drive", "File uploaded with ID: " + uploadedFile.getId());
+
         return null;
     }
 }

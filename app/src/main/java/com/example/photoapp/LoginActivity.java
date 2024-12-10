@@ -83,7 +83,9 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                                 else
                                 {
-                                    txtMessage.setText((CharSequence) task.getException());
+
+                                    String a = task.getException().toString();
+                                    txtMessage.setText( task.getException().toString());
                                     mToast.show();
                                 }
                             }
