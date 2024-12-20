@@ -288,14 +288,23 @@ public class CameraActivity extends AppCompatActivity {
 
     public void moveToNext(View view)
     {
-        ImageView capturedImageView = findViewById(R.id.cameraImageView);
+
 
         if(flag)
         {
-            Intent intent = new Intent(CameraActivity.this, UserFormActivity.class);
-            intent.putStringArrayListExtra("cno",validContainerNumbers);
-            intent.putExtra("masterImg",cam_uri.toString());
-            startActivity(intent);
+            if(validContainerNumbers.size()>0)
+            {
+                Intent intent = new Intent(CameraActivity.this, UserFormActivity.class);
+                intent.putStringArrayListExtra("cno",validContainerNumbers);
+                intent.putExtra("masterImg",cam_uri.toString());
+                startActivity(intent);
+            }
+            else
+            {
+                Toast.makeText(CameraActivity.this,"No valid Container number! Please upload valid container Image!",Toast.LENGTH_SHORT).show();
+
+            }
+
         }
         else
         {
