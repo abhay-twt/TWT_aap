@@ -212,19 +212,7 @@ public class UserFormActivity  extends AppCompatActivity {
                 conSizeView.setText(item, false);
             }
         });
-
-        locView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                String item = adapterView.getItemAtPosition(position).toString();
-                locView.setText(item, false);
-                selectedLocation = item;
-                loadSurveyorList();
-            }
-        });
-
-        surveyorView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+       surveyorView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 String item = adapterView.getItemAtPosition(position).toString();
