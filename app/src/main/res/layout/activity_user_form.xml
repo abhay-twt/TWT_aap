@@ -103,20 +103,22 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="330dp"
         android:layout_height="60dp"
         android:hint="Location"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal">
+
         <AutoCompleteTextView
             android:id="@+id/autoComTVLocationList"
             android:layout_width="330dp"
             android:layout_height="50dp"
-            android:inputType="text" />
+            android:paddingLeft="28dp"
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="330dp"
         android:layout_height="60dp"
@@ -125,20 +127,6 @@
         android:layout_gravity="center_horizontal">
         <AutoCompleteTextView
             android:id="@+id/autoComTVSurveyorNameList"
-            android:layout_width="330dp"
-            android:layout_height="50dp"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="330dp"
-        android:layout_height="60dp"
-        android:hint="Container Status"
-        android:layout_marginTop="30dp"
-        android:layout_gravity="center_horizontal">
-        <AutoCompleteTextView
-            android:id="@+id/autoComTVConStatusList"
             android:layout_width="330dp"
             android:layout_height="50dp"
             android:inputType="text" />
@@ -158,6 +146,19 @@
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="330dp"
+        android:layout_height="60dp"
+        android:hint="Container Status"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center_horizontal">
+        <AutoCompleteTextView
+            android:id="@+id/autoComTVConStatusList"
+            android:layout_width="330dp"
+            android:layout_height="50dp"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
     <TextView
         android:id="@+id/remarkTextView"
         android:layout_width="wrap_content"

@@ -5,15 +5,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
-public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHolder> {
+public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHolder>
+{
     private ArrayList<Uri> uriArrayList;
+    private OnItemClickListener listener;
 
-    public RecycleAdapter(ArrayList<Uri> uriArrayList) {
+    public interface OnItemClickListener{
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener clickListener)
+    {
+        listener = clickListener;
+    }
+
+    public RecycleAdapter(ArrayList<Uri> uriArrayList)
+    {
         this.uriArrayList = uriArrayList;
     }
 
@@ -22,7 +33,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
     public RecycleAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.activity_custom_single_img,parent,false);
-        return new ViewHolder(view);
+        return new ViewHolder(view,listener);
     }
 
     @Override
@@ -38,9 +49,19 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        public ViewHolder(@NonNull View itemView) {
+        Button button;
+        public ViewHolder(@NonNull View itemView,OnItemClickListener listener) {
             super(itemView);
             imageView = itemView.findViewById(R.id.image);
+            button = itemView.findViewById(R.id.cancelButton);
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onItemClick(getAdapterPosition());
+                }
+            });
+
         }
     }
 }

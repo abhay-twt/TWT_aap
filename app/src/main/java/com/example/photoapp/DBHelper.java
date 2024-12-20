@@ -10,6 +10,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,7 +38,7 @@ public class DBHelper extends AppCompatActivity {
 
     }
 
-    public static void LoadSurveyors(MySurveyorsCallback mySurveyorsCallback,String selectedLocation) {
+    public static void LoadSurveyors(String selectedLocation, MySurveyorsCallback mySurveyorsCallback) {
 
         db = FirebaseFirestore.getInstance();
         db.collection("Surveyors")
@@ -61,5 +62,25 @@ public class DBHelper extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    public static void updateTime(String id, HashMap<String, Object> user, MySaveCallBack mySaveCallBack) {
+
+        db = FirebaseFirestore.getInstance();
+        db.collection("User")
+                .document(id)
+                .set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        mySaveCallBack.onCallbackForSaveData(true);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        mySaveCallBack.onCallbackForSaveData(false);
+                    }
+                });
+
+
     }
 }

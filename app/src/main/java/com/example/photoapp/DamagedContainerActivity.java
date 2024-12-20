@@ -1,10 +1,12 @@
 package com.example.photoapp;
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -60,6 +62,13 @@ public class DamagedContainerActivity extends AppCompatActivity {
         adapter = new RecycleAdapter(uri);
         recyclerView.setLayoutManager(new GridLayoutManager(DamagedContainerActivity.this,2));
         recyclerView.setAdapter(adapter);
+        adapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                uri.remove(position);
+                adapter.notifyItemRemoved(position);
+            }
+        });
 
         if(ContextCompat.checkSelfPermission(DamagedContainerActivity.this,android.Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED)
@@ -108,28 +117,57 @@ public class DamagedContainerActivity extends AppCompatActivity {
     @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        ContentResolver contentResolver = getContentResolver();
         super.onActivityResult(requestCode, resultCode, data);
         if((requestCode==1 || requestCode == 123) & resultCode == android.app.Activity.RESULT_OK){
-            if(data!=null)
-            {
-                if(data.getClipData()!=null)
-                {
-                    int x= data.getClipData().getItemCount();
-                    for(int i=0;i<x;i++){
-                        uri.add(data.getClipData().getItemAt(i).getUri());
-                        adapter.notifyDataSetChanged();
+            if (data != null) {
+                if (data.getClipData() != null) {
+                    try
+                    {
+                        int x = data.getClipData().getItemCount();
+                        for (int i = 0; i < x; i++)
+                        {
+
+                            Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver, data.getClipData().getItemAt(i).getUri());
+                            if(photo.getWidth()>1000 && photo.getHeight()>1000)
+                            {
+                                uri.add(data.getClipData().getItemAt(i).getUri());
+                                adapter.notifyDataSetChanged();
+                            }
+                            else
+                            {
+                                Toast.makeText(DamagedContainerActivity.this,"Poor quality! Upload another image!",Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
                     }
-                }
-                else if(data.getData()!=null){
+                    catch(Exception e) {
+                        Toast.makeText(DamagedContainerActivity.this,"Image Error",Toast.LENGTH_SHORT).show();
+                    }
+                } else if (data.getData() != null) {
                     String imageURL = data.getData().getPath();
                     uri.add(Uri.parse(imageURL));
-                }
 
-            }
-            else
-            {
-                uri.add(cam_uri);
-                adapter.notifyDataSetChanged();
+                }
+            } else {
+                try {
+                    Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver, cam_uri);
+                    if(photo.getWidth()>1000 && photo.getHeight()>1000)
+                    {
+                        uri.add(cam_uri);
+                        adapter.notifyDataSetChanged();
+                    }
+                    else
+                    {
+                        Toast.makeText(DamagedContainerActivity.this,"Poor quality! Upload another image!",Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    Toast.makeText(DamagedContainerActivity.this,"Image Error",Toast.LENGTH_SHORT).show();
+
+                }
             }
         }
         else if (requestCode == 2 & resultCode == android.app.Activity.RESULT_OK) {

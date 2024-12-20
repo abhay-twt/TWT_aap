@@ -26,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     boolean isAllFieldsChecked = false;
     EditText userNameField, passWordField;
     FirebaseFirestore db;
+    private Session session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         userNameField = findViewById(R.id.loginUsername);
         passWordField = findViewById(R.id.loginPassword);
         db = FirebaseFirestore.getInstance();
+        session = new Session(getApplicationContext());
     }
 
     public void goToCamera(View view) {
@@ -52,9 +54,11 @@ public class LoginActivity extends AppCompatActivity {
         {
             String userName = userNameField.getText().toString();
             String passWord = passWordField.getText().toString();
+            HashMap<String, Object> User = new HashMap<>();
             try {
                 db.collection("User")
-                        .whereEqualTo("UserName", userName)
+                        .whereEqualTo("EmpId", userName)
+                        .whereEqualTo("Status","Active")
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -66,8 +70,41 @@ public class LoginActivity extends AppCompatActivity {
                                     {
                                         if(Objects.equals(task.getResult().getDocuments().get(0).get("Password"), passWord))
                                         {
-                                            Intent intent = new Intent(LoginActivity.this, CameraActivity.class);
-                                            startActivity(intent);
+                                            String id =task.getResult().getDocuments().get(0).getId().toString();
+                                            DateTimeFormatter d = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
+                                            LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
+                                            User.put("LastLoginTime",d.format(now).toString());
+                                            User.put("CreatedTime",task.getResult().getDocuments().get(0).get("CreatedTime").toString());
+                                            User.put("Email",task.getResult().getDocuments().get(0).get("Email").toString());
+                                            User.put("EmpId",task.getResult().getDocuments().get(0).get("EmpId").toString());
+                                            User.put("FirstName",task.getResult().getDocuments().get(0).get("FirstName").toString());
+                                            User.put("LastName",task.getResult().getDocuments().get(0).get("LastName").toString());
+                                            String loc = task.getResult().getDocuments().get(0).get("Location").toString();
+                                            User.put("Location",loc);
+                                            session.setLoc(loc);
+                                            User.put("Password",task.getResult().getDocuments().get(0).get("Password").toString());
+                                            User.put("PhoneNumber",task.getResult().getDocuments().get(0).get("PhoneNumber").toString());
+                                            User.put("Role",task.getResult().getDocuments().get(0).get("Role").toString());
+                                            User.put("Status",task.getResult().getDocuments().get(0).get("Status").toString());
+                                            User.put("ConPassword",task.getResult().getDocuments().get(0).get("ConPassword").toString());
+
+
+                                            DBHelper.updateTime(id,User,new MySaveCallBack() {
+                                                @Override
+                                                public void onCallbackForSaveData(boolean status)
+                                                {
+                                                    if(status) {
+
+                                                        Intent intent = new Intent(LoginActivity.this, CameraActivity.class);
+                                                        startActivity(intent);
+                                                    }
+                                                    else {
+                                                        Toast.makeText(LoginActivity.this, "Not able to update Login time, Try Again!", Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                }
+                                            });
+
                                         }
                                         else
                                         {

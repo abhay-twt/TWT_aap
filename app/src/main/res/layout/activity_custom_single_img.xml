@@ -21,6 +21,18 @@
             android:layout_height="250dp"
             android:scaleType="centerCrop"
             app:layout_constraintDimensionRatio="1" />
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="250dp"
+            android:background="@color/AirForceBlue"
+            android:text="Delete"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:cornerRadius="200dp"
+            android:onClick="goToCamera"
+            />
     </androidx.cardview.widget.CardView>
 
 </LinearLayout>

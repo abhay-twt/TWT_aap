@@ -3,11 +3,13 @@ package com.example.photoapp;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -58,12 +60,13 @@ public class UserFormActivity  extends AppCompatActivity {
     ArrayList<Uri> uri = new ArrayList<>();
     private static  final int Read_Permission = 101;
     String ImageLink = null;
+    private Session session;
+    public String selectedLocation;
 
     EditText dateTime;
     Uri cam_uri;
     AutoCompleteTextView shippingLineTextView,containerNumberView,activityView,conTypeView,conSizeView,locView,surveyorView, conStatusView;
     TextView remark ;
-    String selectedLocation;
     private GoogleDriveHelper googleDriveHelper;
 
 
@@ -71,6 +74,7 @@ public class UserFormActivity  extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_form);
+        session = new Session(getApplicationContext());
 
         googleDriveHelper = new GoogleDriveHelper(this);
         containerNumberView = findViewById(R.id.autoCompleteTextContainerNo);
@@ -91,7 +95,19 @@ public class UserFormActivity  extends AppCompatActivity {
         adapter = new RecycleAdapter(uri);
         recyclerView.setLayoutManager(new GridLayoutManager(UserFormActivity.this,2));
         recyclerView.setAdapter(adapter);
+        adapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                uri.remove(position);
+                adapter.notifyItemRemoved(position);
+            }
+        });
 
+        //Location
+        String loc = session.getLoc();
+        locView.setText(loc);
+        selectedLocation = loc;
+        locView.setEnabled(false);
         loadSurveyorList();
         if(ContextCompat.checkSelfPermission(UserFormActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
         != PackageManager.PERMISSION_GRANTED)
@@ -128,6 +144,8 @@ public class UserFormActivity  extends AppCompatActivity {
         //Container Number
         Intent intent = getIntent();
         containerNos = intent.getStringArrayListExtra("cno");
+        //Master Img
+        uri.add(Uri.parse(intent.getStringExtra("masterImg")));
         assert containerNos != null;
         if(!containerNos.isEmpty())
         {
@@ -135,7 +153,7 @@ public class UserFormActivity  extends AppCompatActivity {
         }
 
         //Time
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss a");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
         dateTime.setText(dtf.format(now));
         dateTime.setEnabled(false);
@@ -226,8 +244,10 @@ public class UserFormActivity  extends AppCompatActivity {
                 mToast.setDuration(Toast.LENGTH_LONG);
                 mToast.setView(customToastLayout);
 
-                if (item.equals("Damaged")) {
-                    if (CheckAllFields()) {
+                if (item.equals("Damaged"))
+                {
+                    if (CheckAllFields())
+                    {
                         CameraActivity camAct = new CameraActivity();
                         if (camAct.isValidContainerNumber(containerNumberView.getText().toString())) {
                             conStatusView.setText(item, false);
@@ -240,7 +260,8 @@ public class UserFormActivity  extends AppCompatActivity {
                             mToast.show();
                         }
 
-                    } else {
+                    } else
+                    {
                         conStatusView.setText("");
                         txtMessage.setText("All Fields are required");
                         mToast.show();
@@ -261,10 +282,9 @@ public class UserFormActivity  extends AppCompatActivity {
         mToast.setDuration(Toast.LENGTH_LONG);
         mToast.setView(customToastLayout);
 
-        try {
-            if (selectedLocation != null) {
-
-                DBHelper.LoadSurveyors(new MySurveyorsCallback() {
+        try
+        {
+               DBHelper.LoadSurveyors(selectedLocation,new MySurveyorsCallback() {
                     @Override
                     public void onCallback(ArrayList<String> arrayList) {
                         surveyors = arrayList;
@@ -274,11 +294,10 @@ public class UserFormActivity  extends AppCompatActivity {
                             setDropdowns(surveyorView, loadedSurveyors);
                         }
                     }
-                }, selectedLocation);
+                });
 
-
-            }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             txtMessage.setText("Error in Loading Surveyors list");
             mToast.show();
         }
@@ -352,9 +371,10 @@ public class UserFormActivity  extends AppCompatActivity {
     {
 
         HashMap<String, Object> Activity = new HashMap<>();
+
         Activity.put("ContainerNumber", containerNumberView.getText().toString());
         Activity.put("ContainerStatus", conStatusView.getText().toString());
-        DateTimeFormatter d = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss a");
+        DateTimeFormatter d = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
         Activity.put("CreatedTime", d.format(now).toString());//new Timestamp(Instant.now())
         Activity.put("GateStatus", activityView.getText().toString());
@@ -372,22 +392,57 @@ public class UserFormActivity  extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
     {
+        ContentResolver contentResolver = getContentResolver();
         super.onActivityResult(requestCode, resultCode, data);
         if ((requestCode == 1 || requestCode == 123) & resultCode == Activity.RESULT_OK) {
             if (data != null) {
                 if (data.getClipData() != null) {
-                    int x = data.getClipData().getItemCount();
-                    for (int i = 0; i < x; i++) {
-                        uri.add(data.getClipData().getItemAt(i).getUri());
-                        adapter.notifyDataSetChanged();
+                    try
+                    {
+                        int x = data.getClipData().getItemCount();
+                        for (int i = 0; i < x; i++)
+                        {
+
+                            Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver, data.getClipData().getItemAt(i).getUri());
+                            if(photo.getWidth()>1000 && photo.getHeight()>1000)
+                            {
+                                uri.add(data.getClipData().getItemAt(i).getUri());
+                                adapter.notifyDataSetChanged();
+                            }
+                            else
+                            {
+                                Toast.makeText(UserFormActivity.this,"Poor quality! Upload another image!",Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    }
+                    catch(Exception e) {
+                        Toast.makeText(UserFormActivity.this,"Image Error",Toast.LENGTH_SHORT).show();
                     }
                 } else if (data.getData() != null) {
                     String imageURL = data.getData().getPath();
                     uri.add(Uri.parse(imageURL));
+
                 }
             } else {
-                uri.add(cam_uri);
-                adapter.notifyDataSetChanged();
+                try {
+                    Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver, cam_uri);
+                    if(photo.getWidth()>1000 && photo.getHeight()>1000)
+                    {
+                        uri.add(cam_uri);
+                        adapter.notifyDataSetChanged();
+                    }
+                    else
+                    {
+                        Toast.makeText(UserFormActivity.this,"Poor quality! Upload another image!",Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    Toast.makeText(UserFormActivity.this,"Image Error",Toast.LENGTH_SHORT).show();
+
+                }
             }
         }
         else if (requestCode == 2 & resultCode == Activity.RESULT_OK) {
@@ -399,13 +454,14 @@ public class UserFormActivity  extends AppCompatActivity {
                     {
                         try {
 
-                            DateTimeFormatter d = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss a");
+                            DateTimeFormatter d = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss a");
                             LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
                             String folderName = locView.getText().toString()+"_"+containerNumberView.getText().toString()+"_"+d.format(now).toString();
                             googleDriveHelper.createFolder(new CreateFolderCallBack(){
                                 @Override
                                 public void onCallBackCreateFolder(boolean status,String folderId)
                                 {
+                                    final int[] count = {0};
                                     if(status)
                                     {
                                         if (uri!=null)
@@ -419,27 +475,31 @@ public class UserFormActivity  extends AppCompatActivity {
                                                     public void onCallBackCreateFolder(boolean status,String folderId) {
                                                         if(status)
                                                         {
+                                                            count[0] = count[0] +1;
+                                                            if(count[0] == uri.size())
+                                                            {
+                                                                Map<String, Object> Activity = getFilledData("Sound");
+                                                                Activity.put("ImageLink","https://drive.google.com/drive/folders/"+folderId);
+                                                                DBHelper.SaveDetails(new MySaveCallBack() {
+                                                                    @Override
+                                                                    public void onCallbackForSaveData(boolean status) {
+                                                                        if (status) {
+                                                                            Toast.makeText(UserFormActivity.this, "Data saved", Toast.LENGTH_SHORT).show();
+                                                                            Intent intent = new Intent(UserFormActivity.this, CameraActivity.class);
+                                                                            startActivity(intent);
+                                                                        } else {
+                                                                            Toast.makeText(UserFormActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                                                        }
 
+                                                                    }
+                                                                }, Activity);
+                                                            }
                                                         }
                                                     }
                                                 },file, folderId);
                                             }
                                         }
-                                        Map<String, Object> Activity = getFilledData("Sound");
-                                        Activity.put("ImageLink","https://drive.google.com/drive/folders/"+folderId);
-                                        DBHelper.SaveDetails(new MySaveCallBack() {
-                                            @Override
-                                            public void onCallbackForSaveData(boolean status) {
-                                                if (status) {
-                                                    Toast.makeText(UserFormActivity.this, "Data saved", Toast.LENGTH_SHORT).show();
-                                                    Intent intent = new Intent(UserFormActivity.this, CameraActivity.class);
-                                                    startActivity(intent);
-                                                } else {
-                                                    Toast.makeText(UserFormActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-                                                }
 
-                                            }
-                                        }, Activity);
                                     }
                                     else
                                     {
@@ -531,7 +591,7 @@ public String getRealPathFromURI(Uri contentUri, Context a) {
             return false;
         }
 
-        if (containerNumberView.getText().toString().isEmpty() || activityView.getText().toString().isEmpty() || locView.getText().toString().isEmpty() || surveyorView.getText().toString().isEmpty() || conTypeView.getText().toString().isEmpty() || conSizeView.getText().toString().isEmpty() || conStatusView.getText().toString().isEmpty())
+        if (containerNumberView.getText().toString().isEmpty() || activityView.getText().toString().isEmpty() || locView.getText().toString().isEmpty() || surveyorView.getText().toString().isEmpty() || conTypeView.getText().toString().isEmpty() || conSizeView.getText().toString().isEmpty() || conStatusView.getText().toString().isEmpty() || shippingLineTextView.getText().toString().isEmpty())
         {
             return false;
         }

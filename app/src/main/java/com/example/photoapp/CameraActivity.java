@@ -41,15 +41,16 @@ public class CameraActivity extends AppCompatActivity {
         registerResult();
     }
 
-    public void captureImage(View view) {
+   /* public void captureImage(View view) {
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE, "New Picture");
         values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera");
         cam_uri = getApplicationContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cam_uri);
+
         cameraResultLauncher.launch(cameraIntent);
-    }
+    }*/
 
     @RequiresExtension(extension = Build.VERSION_CODES.R, version = 2)
     public void imageFromGallery(View view) {
@@ -70,9 +71,18 @@ public class CameraActivity extends AppCompatActivity {
                             ImageView capturedImageView = findViewById(R.id.cameraImageView);
                             assert cam_uri != null;
                             Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver,cam_uri);
-                            capturedImageView.setImageBitmap(photo);
-                            flag = true;
-                            validContainerNumbers = getValidContainerNumbersFromImage(photo);
+                            if(photo.getWidth()>1000 && photo.getHeight()>1000)
+                            {
+                                capturedImageView.setImageBitmap(photo);
+                                flag = true;
+                                validContainerNumbers = getValidContainerNumbersFromImage(photo);
+                            }
+                            else
+                            {
+                                Toast.makeText(CameraActivity.this,"The Quality of image is poor! Upload another image!",Toast.LENGTH_SHORT).show();
+
+                            }
+
                         }
                         catch (Exception e)
                         {
@@ -93,11 +103,19 @@ public class CameraActivity extends AppCompatActivity {
                         if (result.getResultCode() == RESULT_OK) {
                             // There are no request codes
                             ImageView capturedImageView = findViewById(R.id.cameraImageView);
-                            capturedImageView.setImageURI(cam_uri);
-                            flag = true;
                             ContentResolver contentResolver = getContentResolver();
                             Bitmap photo = MediaStore.Images.Media.getBitmap(contentResolver,cam_uri);
-                            validContainerNumbers = getValidContainerNumbersFromImage(photo);
+                            if(photo.getWidth()>1000 && photo.getHeight()>1000)
+                            {
+                                capturedImageView.setImageBitmap(photo);
+                                flag = true;
+                                validContainerNumbers = getValidContainerNumbersFromImage(photo);
+                            }
+                            else
+                            {
+                                Toast.makeText(CameraActivity.this,"Poor quality! Upload another image!",Toast.LENGTH_SHORT).show();
+
+                            }
                         }
                     }
                     catch (Exception e)
@@ -276,6 +294,7 @@ public class CameraActivity extends AppCompatActivity {
         {
             Intent intent = new Intent(CameraActivity.this, UserFormActivity.class);
             intent.putStringArrayListExtra("cno",validContainerNumbers);
+            intent.putExtra("masterImg",cam_uri.toString());
             startActivity(intent);
         }
         else
