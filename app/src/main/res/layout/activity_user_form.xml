@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:color="@color/AirForceBlue"
-        android:text="Test_App"
+        android:text= "TW_POC"
         android:textAlignment="center"
         android:textSize="22sp"
         android:textStyle="bold"
@@ -73,6 +73,22 @@
             android:inputType="text"
             android:textAlignment="textStart" />
     </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="330dp"
+            android:layout_height="60dp"
+            android:hint="Cycles"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextViewCycles"
+                android:layout_width="330dp"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:inputType="text"
+                android:textAlignment="textStart" />
+        </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -214,6 +230,7 @@
             android:layout_marginTop="20dp"
            />
     </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_Gallery_Images"
         android:layout_width="match_parent"
@@ -223,6 +240,16 @@
         android:layout_marginTop="5dp"
         android:layout_gravity="center_horizontal"
         android:padding="5dp"/>
+
+        <ProgressBar
+            android:id="@+id/progressBarHolder"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
     <Button
     android:id="@+id/NextButton"
     android:layout_width="wrap_content"

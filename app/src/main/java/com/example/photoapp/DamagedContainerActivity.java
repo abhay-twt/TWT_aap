@@ -44,11 +44,13 @@ public class DamagedContainerActivity extends AppCompatActivity {
     Uri cam_uri;
     static HashMap<String, Object> Activity;
     private GoogleDriveHelper googleDriveHelper;
+    private Session session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_damaged_container);
+        session = new Session(getApplicationContext());
 
         googleDriveHelper = new GoogleDriveHelper(this);
         Intent intent = getIntent();
@@ -224,7 +226,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
                                     }
 
                                 }
-                            },folderName);
+                            },folderName,session.getLoc());
 
 
                         }

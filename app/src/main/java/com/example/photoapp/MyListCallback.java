@@ -2,6 +2,6 @@ package com.example.photoapp;
 
 import java.util.ArrayList;
 
-public interface MySurveyorsCallback {
+public interface MyListCallback {
     void onCallback( ArrayList<String> arrayList);
 }

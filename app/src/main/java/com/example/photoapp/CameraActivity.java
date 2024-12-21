@@ -41,16 +41,15 @@ public class CameraActivity extends AppCompatActivity {
         registerResult();
     }
 
-   /* public void captureImage(View view) {
+   public void captureImage(View view) {
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE, "New Picture");
         values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera");
         cam_uri = getApplicationContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cam_uri);
-
         cameraResultLauncher.launch(cameraIntent);
-    }*/
+    }
 
     @RequiresExtension(extension = Build.VERSION_CODES.R, version = 2)
     public void imageFromGallery(View view) {

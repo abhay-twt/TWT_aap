@@ -16,7 +16,7 @@
             android:id="@+id/cameraAppNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test_App"
+            android:text="TW_POC"
             android:textColor="@color/Purple"
             android:textAlignment="center"
             android:textSize="22sp"

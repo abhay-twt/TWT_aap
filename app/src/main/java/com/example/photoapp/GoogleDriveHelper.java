@@ -83,7 +83,7 @@ public class GoogleDriveHelper {
         }
     }
 
-    public void createFolder(CreateFolderCallBack createFolderCallBack, String folderName)
+    public void createFolder(CreateFolderCallBack createFolderCallBack, String folderName,String loc)
     {
         try
         {
@@ -92,7 +92,7 @@ public class GoogleDriveHelper {
                 public void onCallBackCreateFolder(boolean status,String folderId) {
                     createFolderCallBack.onCallBackCreateFolder(status,folderId);
                 }
-            },folderName,mDriveService).execute();
+            },folderName,mDriveService,loc).execute();
         }
         catch (Exception e)
         {
