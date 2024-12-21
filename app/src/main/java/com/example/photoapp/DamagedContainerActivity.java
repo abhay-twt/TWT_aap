@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
     static HashMap<String, Object> Activity;
     private GoogleDriveHelper googleDriveHelper;
     private Session session;
+    ProgressBar progressBarHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,8 @@ public class DamagedContainerActivity extends AppCompatActivity {
         shareIcon = findViewById(R.id.ShareIconImageView);
         recyclerView = findViewById(R.id.recyclerView_Gallery_Images);
         remark = findViewById(R.id.editTextMultiLine);
+        progressBarHolder = findViewById(R.id.progressBarHolder);
+        uri.add(Uri.parse(intent.getStringExtra("masterImg")));
 
         adapter = new RecycleAdapter(uri);
         recyclerView.setLayoutManager(new GridLayoutManager(DamagedContainerActivity.this,2));
@@ -181,6 +185,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
                     {
                         try {
 
+                            progressBarHolder.setVisibility(View.VISIBLE);
                             DateTimeFormatter d = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss a");
                             LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
                             String folderName = Activity.get("Location").toString()+"_"+Activity.get("ContainerNumber").toString()+"_"+d.format(now).toString();
@@ -210,6 +215,7 @@ public class DamagedContainerActivity extends AppCompatActivity {
                                             @Override
                                             public void onCallbackForSaveData(boolean status) {
                                                 if (status) {
+                                                    progressBarHolder.setVisibility(View.GONE);
                                                     Toast.makeText(DamagedContainerActivity.this, "Data saved", Toast.LENGTH_SHORT).show();
                                                     Intent intent = new Intent(DamagedContainerActivity.this, CameraActivity.class);
                                                     startActivity(intent);

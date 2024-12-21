@@ -89,6 +89,15 @@
             android:background="@color/white"
             android:layout_marginTop="5dp"
             android:padding="5dp"/>
+        <ProgressBar
+            android:id="@+id/progressBarHolder"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
