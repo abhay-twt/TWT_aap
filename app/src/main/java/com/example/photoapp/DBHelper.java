@@ -64,43 +64,44 @@ public class DBHelper extends AppCompatActivity {
                 });
     }
 
-    public static void loadActivities(MyListCallback myActivitiesCallback)
+    public static void loadActivities(UserFormActivity userFormActivity, MyListCallback myActivitiesCallback)
     {
-
-        db = FirebaseFirestore.getInstance();
-        db.collection("GateActivity")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        ArrayList<String> result = new ArrayList<String>();
-                        if (task.isSuccessful()) {
-                            if (!task.getResult().isEmpty())
+            db = FirebaseFirestore.getInstance();
+            db.collection("GateActivity")
+                    .get()
+                    .addOnCompleteListener(userFormActivity,new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task)
+                        {
+                            ArrayList<String> result = new ArrayList<String>();
+                            if (task.isSuccessful())
                             {
-                                for (DocumentSnapshot document : task.getResult()) {
-                                    String activityName = Objects.requireNonNull(document.get("Name")).toString();
-                                    result.add(activityName);
+                                if (!task.getResult().isEmpty())
+                                {
+                                    for (DocumentSnapshot document : task.getResult())
+                                    {
+                                        String activityName = Objects.requireNonNull(document.get("Name")).toString();
+                                        result.add(activityName);
+                                    }
+
                                 }
 
                             }
 
+                            myActivitiesCallback.onCallback(result);
+
                         }
-
-                        myActivitiesCallback.onCallback(result);
-
-                    }
-                });
-
+                    });
     }
 
 
-    public static void loadCycles(MyListCallback myCyclesCallBack)
+    public static void loadCycles(UserFormActivity userFormActivity, MyListCallback myCyclesCallBack)
     {
 
         db = FirebaseFirestore.getInstance();
         db.collection("Cycles")
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnCompleteListener(userFormActivity,new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         ArrayList<String> result = new ArrayList<String>();

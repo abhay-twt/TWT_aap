@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,8 +22,12 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresExtension;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
@@ -38,10 +45,37 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         registerResult();
     }
 
-   public void captureImage(View view) {
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+
+       getMenuInflater().inflate(R.menu.menu,menu);
+       return true;
+    }
+
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+
+       if(item.getItemId() == R.id.logout)
+       {
+           LogoutAlert l = new LogoutAlert();
+           AlertDialog alert = l.alert(CameraActivity.this,getApplicationContext());
+           alert.show();
+
+       }
+
+        return true;
+    }
+
+    public void captureImage(View view) {
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE, "New Picture");
         values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera");

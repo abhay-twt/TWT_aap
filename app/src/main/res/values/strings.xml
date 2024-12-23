@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">PhotoApp</string>
+
     <string name="cameraTxtMsg">Capture Container image to extract Container Number</string>
     <string name="cameraTxtMsg2">Captured Image will be displayed here</string>
     <string name="containerMsg">You are submitting with container number </string>
     <string name="continueMsg">Do you want to continue?</string>
     <string name="checkMsg">Check the container number</string>
+    <string name="app_name">TW_POC\n</string>
 
 </resources>
