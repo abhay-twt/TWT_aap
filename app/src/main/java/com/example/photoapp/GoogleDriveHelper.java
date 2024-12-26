@@ -19,15 +19,7 @@ import com.google.api.services.drive.DriveScopes;
 
 public class GoogleDriveHelper {
 
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
-    private static final String APPLICATION_NAME = "Google Drive Quickstart";
-
-    private static final String CLIENT_ID = "161029530023-bs2f0all5min404rmqhkiajvunjs345p.apps.googleusercontent.com";
-
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
     private static final String SCOPES2 = "https://www.googleapis.com/auth/drive";
     private static final List<String> SCOPES =

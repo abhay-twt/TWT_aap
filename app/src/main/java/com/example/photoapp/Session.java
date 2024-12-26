@@ -22,4 +22,9 @@ public class Session {
         String loc = prefs.getString("Location","");
         return loc;
     }
+
+    public void Clear()
+    {
+        prefs.edit().clear().commit();
+    }
 }

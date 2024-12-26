@@ -2,6 +2,7 @@ package com.example.photoapp;
 import java.util.ArrayList;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -11,7 +12,6 @@ import android.provider.MediaStore;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,57 +22,75 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresExtension;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import java.util.Arrays;
-import java.util.Objects;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends BaseActivityToolbar {
     ActivityResultLauncher<Intent> galleryResultLauncher,cameraResultLauncher;
     ArrayList<String> validContainerNumbers = new ArrayList<>();
     boolean flag = false;
     Uri cam_uri;
+    private Session session;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        session = new Session(getApplicationContext());
+        Toolbar toolbar= findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         registerResult();
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-
-       getMenuInflater().inflate(R.menu.menu,menu);
-       return true;
+        getMenuInflater().inflate(R.menu.menu,menu);
+        return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.logout)
+        {
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+            AlertDialog alert = alert();
+            alert.show();
 
-
-       if(item.getItemId() == R.id.logout)
-       {
-           LogoutAlert l = new LogoutAlert();
-           AlertDialog alert = l.alert(CameraActivity.this,getApplicationContext());
-           alert.show();
-
-       }
+        }
 
         return true;
+    }
+
+    public AlertDialog alert() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(CameraActivity.this);
+        builder.setTitle("Confirmation PopUp!").
+                setMessage("You sure, that you want to logout?");
+        builder.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                            session.Clear();
+                            Intent intent = new Intent(CameraActivity.this,LoginActivity.class);
+                            startActivity(intent);
+
+
+                    }
+                });
+        builder.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        return builder.create();
     }
 
     public void captureImage(View view) {

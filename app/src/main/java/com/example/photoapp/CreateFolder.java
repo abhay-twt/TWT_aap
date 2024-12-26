@@ -14,8 +14,6 @@ public class CreateFolder extends AsyncTask<String,Void,Void> {
     Drive mDriveService;
     CreateFolderCallBack createFolderCallBack;
     String loc;
-    private Session session;
-
     CreateFolder(CreateFolderCallBack createFolderCallBack, String folderName, Drive mDriveService, String loc) {
         // list all the parameters like in normal class define
         this.folderName = folderName;

@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -28,18 +29,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.time.LocalDateTime;
+import androidx.recyclerview.widget.RecyclerView;import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -47,7 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class UserFormActivity  extends AppCompatActivity {
+public class UserFormActivity  extends BaseActivityToolbar {
 
 
     String[]  containerType = {"DC","HC","FR","OT","RF","HARDTOP","PF","OP","TK","HT","CF","GP","DV","FR(ODC)","OS","ODC","TC","HQ","GL","HQGOH","HQRF","GLGOH"};
@@ -283,23 +279,43 @@ public class UserFormActivity  extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu,menu);
-
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-
-        if(item.getTitle().toString().equals("Logout"))
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.logout)
         {
-            LogoutAlert l = new LogoutAlert();
-            AlertDialog alert = l.alert(UserFormActivity.this,getApplicationContext());
+
+            AlertDialog alert = alert();
             alert.show();
 
         }
 
-        return super.onOptionsItemSelected(item);
+        return true;
+    }
+
+    public AlertDialog alert() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserFormActivity.this);
+        builder.setTitle("Confirmation PopUp!").
+                setMessage("You sure, that you want to logout?");
+        builder.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        session.Clear();
+                        Intent intent = new Intent(UserFormActivity.this,LoginActivity.class);
+                        startActivity(intent);
+                    }
+                });
+        builder.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        return builder.create();
     }
 
     private void loadCyclesList() {

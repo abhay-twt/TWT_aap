@@ -3,6 +3,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -12,6 +13,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -21,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -35,7 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class DamagedContainerActivity extends AppCompatActivity {
+public class DamagedContainerActivity extends BaseActivityToolbar {
 
     RecyclerView recyclerView;
     RecycleAdapter adapter;
@@ -53,7 +56,6 @@ public class DamagedContainerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_damaged_container);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -258,6 +260,51 @@ public class DamagedContainerActivity extends AppCompatActivity {
 
 
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.logout)
+        {
+
+            AlertDialog alert = alert();
+            alert.show();
+
+        }
+
+        return true;
+    }
+
+    public AlertDialog alert() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(DamagedContainerActivity.this);
+        builder.setTitle("Confirmation PopUp!").
+                setMessage("You sure, that you want to logout?");
+        builder.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        session.Clear();
+                        Intent intent = new Intent(DamagedContainerActivity.this,LoginActivity.class);
+                        startActivity(intent);
+
+
+                    }
+                });
+        builder.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        return builder.create();
     }
 
     public String getRealPathFromURI(Uri contentUri, Context a) {
